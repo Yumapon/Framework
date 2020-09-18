@@ -1,0 +1,11 @@
+!!container.BeanDefinition
+name: TestA
+type: beans.TestA
+---
+!!container.BeanDefinition
+name: TestB
+type: beans.TestB
+---
+!!container.BeanDefinition
+name: TestC
+type: beans.TestC

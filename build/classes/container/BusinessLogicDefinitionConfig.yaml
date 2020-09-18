@@ -1,0 +1,19 @@
+!!container.BusinessLogicDefinition
+interfaceClass: businessLogic.BusinessLogic
+name: bl1
+type: businessLogic.BusinessLogicTestA
+---
+!!container.BusinessLogicDefinition
+interfaceClass: businessLogic.BusinessLogic
+name: bl2
+type: businessLogic.BusinessLogicTestB
+---
+!!container.BusinessLogicDefinition
+interfaceClass: businessLogic.BusinessLogic
+name: bl3
+type: businessLogic.BusinessLogicTestC
+---
+!!container.BusinessLogicDefinition
+interfaceClass: businessLogic.BusinessLogic
+name: bl4
+type: businessLogic.BusinessLogicTestD
