@@ -1,0 +1,27 @@
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.junit.Test;
+
+import container.ApplicationContainer;
+import container.InstanceAndClassObjectforServlet;
+
+public class JunitgetActionTest {
+
+	ApplicationContainer ac = new ApplicationContainer();
+
+	@Test
+	public void getActionTest() {
+		String actionName = "actionA";
+		InstanceAndClassObjectforServlet cams = ac.getAction(actionName);
+		Class<?> clazz = cams.getClazz();
+		try {
+			Method m = clazz.getMethod("actionMethod");
+			m.invoke(cams.getObj());
+		} catch (NoSuchMethodException | SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+	}
+
+}

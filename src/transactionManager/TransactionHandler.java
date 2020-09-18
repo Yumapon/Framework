@@ -1,0 +1,61 @@
+package transactionManager;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
+public class TransactionHandler implements InvocationHandler {
+
+	//BusinessLogicの実装クラス
+	private final Object target;
+
+	/*
+	 * BusinessLogicの前後にトランザクション管理を行うための
+	 * トランザクション管理クラス
+	 */
+	private TransactionManager tm = new DefaultTransactionManager();
+
+	/*
+	 * トランザクション管理ID
+	 */
+	String transactionID;
+
+	/*
+	 * コンストラクタ
+	 */
+	public TransactionHandler(Object target) {
+		this.target = target;
+	}
+
+	@Override
+	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		//トランザクションの開始
+		transactionID = tm.beginTransaction();
+		/*
+		 *トランザクションが正常に開始された場合
+		 *transactionIDを渡し、トランザクションを確保する。
+		 */
+		if (tm.isTransaction()) {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("トランザクションは開始されました。");
+			tm.getConnection(transactionID);
+
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("transactionID:" + transactionID + "で、データベースの確保を行いました。");
+		} else {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("トランザクションは開始されていません。");
+		}
+		Object ret = null;
+		try {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("ビジネスロジックのメソッドを実行します。");
+			ret = method.invoke(target, args);
+			return ret;
+		} finally {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("トランザクションを終了し、コネクションも返却します。");
+			tm.endTransaction();
+		}
+	}
+
+}
