@@ -2,8 +2,8 @@ import java.lang.reflect.Field;
 
 import org.junit.Test;
 
-import actions.ActionTestA;
-import actions.Service;
+import annotation.Service;
+import usercreatesample.actions.ActionTestA;
 
 public class JunitActionTestA {
 

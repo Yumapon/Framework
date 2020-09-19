@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
@@ -12,10 +14,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import actions.ActionMethod;
+import annotation.ActionMethod;
+import annotation.SessionScoped;
 import container.ApplicationContainer;
 import container.InstanceAndClassObjectforServlet;
+import exception.IlligalMethodNameException;
 
 /**
  * Servlet implementation class HogeHogeServlet
@@ -52,6 +57,16 @@ public class HogeHogeServlet extends HttpServlet {
 
 		//Beanのインスタンス取得
 		Object form = cams.getObj();
+
+		//Beanのライフタイムがセッションスコープであれば、セッションに格納する
+		if(cams.getClazz().isAnnotationPresent(SessionScoped.class)) {
+			//ログ発生箇所
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			//例外内容
+			System.out.println("セッションにBeanを格納します。" + "Bean名：" + formName );
+			HttpSession session = request.getSession(true);
+			session.setAttribute(formName, form);
+		}
 
 		//RequestのParameterName格納用配列
 		ArrayList<String> paraNameList = new ArrayList<>();
@@ -122,7 +137,38 @@ public class HogeHogeServlet extends HttpServlet {
 
 				//Fieldに値をセット
 				f.setAccessible(true);//無理やり書き込む。
-				f.set(form, request.getParameter(paraName));
+				System.out.println(request.getParameter(paraName));
+
+				//Fieldの方を取得
+				Class<?> type = f.getType();
+				String typeName = type.toString();
+
+				if(typeName.contains("String")) {
+					f.set(form, request.getParameter(paraName));
+				}else if(typeName.contains("int")) {
+					f.set(form, Integer.parseInt(request.getParameter(paraName)));
+				}else if(typeName.contains("boolean")) {
+					f.set(form, Boolean.parseBoolean(request.getParameter(paraName)));
+				}else if(typeName.contains("byte")) {
+					f.set(form, Byte.parseByte(request.getParameter(paraName)));
+				}else if(typeName.contains("short")) {
+					f.set(form, Short.parseShort(request.getParameter(paraName)));
+				}else if(typeName.contains("long")) {
+					f.set(form, Long.parseLong(request.getParameter(paraName)));
+				}else if(typeName.contains("float")){
+					f.set(form, Float.parseFloat(request.getParameter(paraName)));
+				}else if(typeName.contains("double")) {
+					f.set(form, Double.parseDouble(request.getParameter(paraName)));
+				}else if(typeName.contains("java.util.Date")) {
+					SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+					java.util.Date date = sdFormat.parse(request.getParameter(paraName));
+					f.set(form, date);
+				}else if(typeName.contains("java.sql.Date")) {
+					f.set(form, java.sql.Date.valueOf(request.getParameter(paraName)));
+				}else if(typeName.contains("java.sql.Time")) {
+					f.set(form, java.sql.Time.valueOf(request.getParameter(paraName)));
+				}
+
 				f.setAccessible(false);
 
 			} catch (NoSuchFieldException | SecurityException e1) {
@@ -130,6 +176,9 @@ public class HogeHogeServlet extends HttpServlet {
 				e1.printStackTrace();
 			} catch (IllegalArgumentException | IllegalAccessException e1) {
 
+				e1.printStackTrace();
+			} catch (ParseException e1) {
+				System.out.println("システムエラー：Date型への変換に失敗しました");
 				e1.printStackTrace();
 			}
 		}
@@ -148,6 +197,9 @@ public class HogeHogeServlet extends HttpServlet {
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//例外内容
 		System.out.println("実行するメソッドを探しています。");
+		//実行できたか確認するフラグ
+		boolean invokeMethodCheck = false;
+
 		for(Method m2 : methods) {
 			if(m2.isAnnotationPresent(ActionMethod.class)) {
 				ActionMethod aMethod = m2.getAnnotation(ActionMethod.class);
@@ -157,17 +209,40 @@ public class HogeHogeServlet extends HttpServlet {
 					try {
 						//ログ発生箇所
 						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-						//例外内容
-						System.out.println("実行するメソッドが見つかりました。実行します");
+						//処理内容
+						System.out.print("実行するメソッドが見つかりました。実行します 実行するメソッド：");
 						System.out.println(m2.getName());
-						m2.invoke(cams2.getObj());
+
+						String urlAndMethodStr = (String) m2.invoke(cams2.getObj());
+
+						//遷移先URLとメソッド（forword or redirect）を取得
+						String[] urlAndMethod = urlAndMethodStr.split(" : ", 0);
+
+						invokeMethodCheck = true;
+
+						if(urlAndMethod[1].equals("forword")) {
+							request.getRequestDispatcher(urlAndMethod[0]).forward(request, response);
+						}else if(urlAndMethod[1].equals("redirect")) {
+							response.sendRedirect(urlAndMethod[0]);
+						}else {
+							throw new IlligalMethodNameException();
+						}
 
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-						// TODO 自動生成された catch ブロック
+
+						e1.printStackTrace();
+					} catch (IlligalMethodNameException e1) {
+						//ログ発生箇所
+						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+						//例外内容
+						System.out.print("メソッド名が間違っています メソッド名はforwordもしくはredirectで指定してください");
 						e1.printStackTrace();
 					}
 				}
 			}
+		}
+		if(!invokeMethodCheck) {
+			System.out.println("指定されたメソッドは見つかりませんでした");
 		}
 
 	}

@@ -9,8 +9,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
-import actions.FormInjection;
-import actions.Service;
+import annotation.FormInjection;
+import annotation.Service;
 import display.DisplayText;
 import transactionManager.TransactionHandler;
 
