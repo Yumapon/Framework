@@ -1,5 +1,3 @@
-ApplicationConfig
-WebContent
-build
-src
-testsrc
+#設定ファイルはgitにあげない
+*.yaml
+
