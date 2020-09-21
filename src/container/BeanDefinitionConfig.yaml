@@ -1,11 +1,11 @@
 !!container.BeanDefinition
 name: TestA
-type: beans.TestA
+type: usercreatesample.beans.TestA
 ---
 !!container.BeanDefinition
 name: TestB
-type: beans.TestB
+type: usercreatesample.beans.TestB
 ---
 !!container.BeanDefinition
 name: TestC
-type: beans.TestC
+type: usercreatesample.beans.TestC
