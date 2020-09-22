@@ -3,13 +3,13 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 import entityCreater.info.EntityInfo;
-import entityCreater.reader.DBReader;
+import entityCreater.reader.DBReaderImplements;
 
 public class JunitDBReaderTest {
 
 	@Test
 	public void test() {
-		DBReader dbr = new DBReader();
+		DBReaderImplements dbr = new DBReaderImplements();
 		@SuppressWarnings("static-access")
 		ArrayList<EntityInfo> list = dbr.read();
 

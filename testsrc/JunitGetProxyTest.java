@@ -1,11 +1,11 @@
 import org.junit.Test;
 
-import container.ApplicationContainer;
+import container.ApplicationContainerImplemention;
 import usercreatesample.businessLogic.BusinessLogic;
 
 public class JunitGetProxyTest {
 
-	ApplicationContainer apc = new ApplicationContainer();
+	ApplicationContainerImplemention apc = new ApplicationContainerImplemention();
 
 	@Test
 	public void test() {

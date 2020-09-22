@@ -1,11 +1,11 @@
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import container.ApplicationContainer;
+import container.ApplicationContainerImplemention;
 
 public class JunitInstanceGeneratorTest {
 
-	ApplicationContainer ig = new ApplicationContainer();;
+	ApplicationContainerImplemention ig = new ApplicationContainerImplemention();;
 
 	@ParameterizedTest
 	@ValueSource(strings = {"beans.TestA", "beans.TestB", "beans.TestC"})

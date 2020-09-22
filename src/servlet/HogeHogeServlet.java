@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import annotation.ActionMethod;
 import annotation.SessionScoped;
 import container.ApplicationContainer;
+import container.ApplicationContainerImplemention;
 import container.InstanceAndClassObjectforServlet;
 import exception.IlligalMethodNameException;
 
@@ -31,7 +32,7 @@ public class HogeHogeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	//コンテナ生成
-	ApplicationContainer ac = new ApplicationContainer();
+	ApplicationContainer ac = (ApplicationContainer) new ApplicationContainerImplemention();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -164,47 +165,6 @@ public class HogeHogeServlet extends HttpServlet {
 		paraNameList.remove(paraNameList.indexOf("actionMethodName"));
 		paraNameList.remove(paraNameList.indexOf("button"));
 
-		//setメソッドを実行してインスタンスに値を格納
-		/*
-		String paraName;
-		Method m = null;
-		for (int i = 0; i < (paraNameList.size() - 1); i++) {
-			paraName = paraNameList.get(i);
-			String setMethodName = "set" + paraName.substring(0, 1).toUpperCase() + paraName.substring(1).toLowerCase();
-
-			try {
-				//setMethodを取得
-				loop: for (Method method : cams.getClazz().getMethods()) {
-				      for (Class<?> p : method.getParameterTypes()) {
-		　		    	  if(setMethodName.equals(method.getName())) {
-				    		  if(p.getName().contains("String")) {
-				    			  m = cams.getClazz().getMethod(setMethodName, String.class);
-				    			  //Setメソッドは引数が絶対に１つなハズなので、これでOK
-				    			  m.invoke(form, request.getParameter(paraName));
-				    			  break loop;
-				    		  }else if(p.getName().contains("int")) {
-				    			  m = cams.getClazz().getMethod(setMethodName, int.class);
-				    			  m.invoke(form, Integer.parseInt(request.getParameter(paraName)));
-				    			  break loop;
-				    		  }
-				    	  }
-				      }
-				    }
-
-
-			} catch (NoSuchMethodException | SecurityException e1) {
-				//ログ発生箇所
-				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-				//例外内容
-				System.out.println("システムエラー：セットメソッドが見つかりません。");
-				e1.printStackTrace();
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-				// TODO 自動生成された catch ブロック
-				e1.printStackTrace();
-			}
-		}
-		*/
-
 		//Fieldにリクエストの値をセット
 		String paraName;
 		for (int i = 0; i < paraNameList.size(); i++) {
@@ -225,20 +185,14 @@ public class HogeHogeServlet extends HttpServlet {
 
 				if (typeName.contains("String")) {
 					f.set(form, request.getParameter(paraName));
-				} else if (typeName.contains("int")) {
-					f.set(form, Integer.parseInt(request.getParameter(paraName)));
+				} else if (typeName.contains("int") || typeName.contains("long") || typeName.contains("float") || typeName.contains("double")) {
+					f.set(form, Double.parseDouble(request.getParameter(paraName)));
 				} else if (typeName.contains("boolean")) {
 					f.set(form, Boolean.parseBoolean(request.getParameter(paraName)));
 				} else if (typeName.contains("byte")) {
 					f.set(form, Byte.parseByte(request.getParameter(paraName)));
 				} else if (typeName.contains("short")) {
 					f.set(form, Short.parseShort(request.getParameter(paraName)));
-				} else if (typeName.contains("long")) {
-					f.set(form, Long.parseLong(request.getParameter(paraName)));
-				} else if (typeName.contains("float")) {
-					f.set(form, Float.parseFloat(request.getParameter(paraName)));
-				} else if (typeName.contains("double")) {
-					f.set(form, Double.parseDouble(request.getParameter(paraName)));
 				} else if (typeName.contains("java.util.Date")) {
 					SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 					java.util.Date date = sdFormat.parse(request.getParameter(paraName));
@@ -265,3 +219,45 @@ public class HogeHogeServlet extends HttpServlet {
 	}
 
 }
+
+//setメソッドを実行してインスタンスに値を格納
+/*
+String paraName;
+Method m = null;
+for (int i = 0; i < (paraNameList.size() - 1); i++) {
+	paraName = paraNameList.get(i);
+	String setMethodName = "set" + paraName.substring(0, 1).toUpperCase() + paraName.substring(1).toLowerCase();
+
+	try {
+		//setMethodを取得
+		loop: for (Method method : cams.getClazz().getMethods()) {
+		      for (Class<?> p : method.getParameterTypes()) {
+　		    	  if(setMethodName.equals(method.getName())) {
+		    		  if(p.getName().contains("String")) {
+		    			  m = cams.getClazz().getMethod(setMethodName, String.class);
+		    			  //Setメソッドは引数が絶対に１つなハズなので、これでOK
+		    			  m.invoke(form, request.getParameter(paraName));
+		    			  break loop;
+		    		  }else if(p.getName().contains("int")) {
+		    			  m = cams.getClazz().getMethod(setMethodName, int.class);
+		    			  m.invoke(form, Integer.parseInt(request.getParameter(paraName)));
+		    			  break loop;
+		    		  }
+		    	  }
+		      }
+		    }
+
+
+	} catch (NoSuchMethodException | SecurityException e1) {
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//例外内容
+		System.out.println("システムエラー：セットメソッドが見つかりません。");
+		e1.printStackTrace();
+	} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+		// TODO 自動生成された catch ブロック
+		e1.printStackTrace();
+	}
+}
+*/
+

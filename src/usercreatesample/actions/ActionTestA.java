@@ -18,6 +18,10 @@ public class ActionTestA {
 	@FormInjection
 	TestA testA;
 
+	/*
+	@FormInjection
+	TestB testb;
+	*/
 
 	@ActionMethod("testMethod")
 	public String actionMethod() {

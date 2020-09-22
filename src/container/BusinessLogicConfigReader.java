@@ -4,10 +4,10 @@ import java.util.HashMap;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class BusinessLogicConfigReader {
+public class BusinessLogicConfigReader implements Reader<HashMap<String, BusinessLogicDefinition>>{
 
 	//Bean定義ファイルの名前
-	String configFileName = "BusinessLogicDefinitionConfig.yaml";
+	String configFileName = DefaultSettingValueFile.BUSINESSLOGICCONFIGFILENAME;
 
 	//コンストラクタ
 	public BusinessLogicConfigReader() {
@@ -22,6 +22,7 @@ public class BusinessLogicConfigReader {
 	}
 
 	//yamlファイルからビジネスロジック定義を取得するメソッド(引数なし)
+	@Override
 	public HashMap<String, BusinessLogicDefinition> read() {
 
 		//ログ発生箇所
@@ -48,6 +49,7 @@ public class BusinessLogicConfigReader {
 	}
 
 	//yamlファイルからビジネスロジック定義を取得するメソッド(引数あり)※基本使用しないハズ
+	@Override
 	public HashMap<String, BusinessLogicDefinition> read(String configFileName) {
 
 		//指定されたファイル名をセット

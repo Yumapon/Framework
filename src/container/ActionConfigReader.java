@@ -16,10 +16,10 @@ import org.yaml.snakeyaml.Yaml;
  * @author okamoto yuma
  *
  */
-public class ActionConfigReader {
+public class ActionConfigReader implements Reader<HashMap<String, ActionDefinition>>{
 
 	//Bean定義ファイルの名前
-		String configFileName = "ActionDefinitionConfig.yaml";
+		String configFileName = DefaultSettingValueFile.ACTIONCONFIGFILENAME;
 
 		//コンストラクタ
 		public ActionConfigReader() {
@@ -36,6 +36,7 @@ public class ActionConfigReader {
 		/**
 		 * @return アクション設定ファイルの中身
 		 */
+		@Override
 		public HashMap<String, ActionDefinition> read() {
 
 			//ローカル変数の定義
@@ -56,6 +57,7 @@ public class ActionConfigReader {
 		 * @param configFileName
 		 * @return アクション設定ファイルの中身
 		 */
+		@Override
 		public HashMap<String, ActionDefinition> read(String configFileName) {
 
 			//指定されたファイル名をセット

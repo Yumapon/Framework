@@ -2,7 +2,7 @@ package container;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class EnvironmentConfigReader {
+public class EnvironmentConfigReader implements Reader<DBConfig>{
 
 	//DBの設定ファイル
 	static String configFileName = "DBProfile.yaml";

@@ -1,17 +1,17 @@
 import org.junit.Before;
 import org.junit.Test;
 
-import container.ApplicationContainer;
+import container.ApplicationContainerImplemention;
 import container.InstanceAndClassObjectforServlet;
 
 public class JunitContainerTest {
 
-	ApplicationContainer ac;
+	ApplicationContainerImplemention ac;
 
 	@Before
 	public void setUp(){
 		//引数なしコンストラクタでの生成
-		ac = new ApplicationContainer();
+		ac = new ApplicationContainerImplemention();
 	}
 
 	//@Test

@@ -4,10 +4,10 @@ import java.util.HashMap;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class BeanConfigReader {
+public class BeanConfigReader implements Reader<HashMap<String, String>>{
 
 	//Bean定義ファイルの名前
-	String configFileName = "BeanDefinitionConfig.yaml";
+	String configFileName = DefaultSettingValueFile.BEANCONFIGFILENAME;
 
 	//コンストラクタ
 	public BeanConfigReader() {
@@ -21,6 +21,7 @@ public class BeanConfigReader {
 	}
 
 	//yamlファイルからBean定義を取得するメソッド(引数なし)
+	@Override
 	public HashMap<String, String> read() {
 
 		//ローカル変数の定義
@@ -37,6 +38,7 @@ public class BeanConfigReader {
 	}
 
 	//yamlファイルからBean定義を取得するメソッド(引数あり)※基本使用しないハズ
+	@Override
 	public HashMap<String, String> read(String configFileName) {
 
 		//指定されたファイル名をセット
