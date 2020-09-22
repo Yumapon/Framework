@@ -27,4 +27,10 @@ public class BusinessLogicTestD implements BusinessLogic{
 		return false;
 	}
 
+	@Override
+	public void login(String a, String b) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
 }

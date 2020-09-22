@@ -8,7 +8,7 @@ public interface ApplicationContainer {
 
 	Object generator();
 
-	InstanceAndClassObjectforServlet getCAMS(String instanceName);
+	//InstanceAndClassObjectforServlet getCAMS(String instanceName);
 
 	InstanceAndClassObjectforServlet getAction(String actionName);
 

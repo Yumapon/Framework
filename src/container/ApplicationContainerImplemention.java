@@ -27,7 +27,7 @@ public class ApplicationContainerImplemention implements ApplicationContainer{
 	//Bean定義
 	HashMap<String, String> beanDefinitions;
 	//Bean
-	Object bean;
+	//Object bean;
 
 	//Action定義取得クラス
 	ActionConfigReader acr;
@@ -150,45 +150,6 @@ public class ApplicationContainerImplemention implements ApplicationContainer{
 			return obj;
 		}
 
-	//バインディング用オブジェクト取得メソッド
-	public InstanceAndClassObjectforServlet getCAMS(String instanceName) {
-		//ログ発生箇所
-		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-		//処理内容
-		System.out.println("getCAMSメソッドを実行します。");
-
-		InstanceAndClassObjectforServlet cams = new InstanceAndClassObjectforServlet();
-		//インスタンス名からクラスパスを取得
-		instancePlace = beanDefinitions.get(instanceName);
-
-		try {
-			//インスタンスの作成
-			Class<?> instanceClass = Class.forName(instancePlace);
-			bean = instanceClass.getDeclaredConstructor().newInstance();
-			//camsにインスタンスを格納
-			cams.setObj(bean);
-			//camsにメソッドを格納
-			cams.setClazz(instanceClass);
-			//ログ発生箇所
-			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-			//処理内容
-			System.out.println("指定されたクラスパスのBean生成が完了しました。");
-		} catch (ClassNotFoundException e) {
-			//ログ発生箇所
-			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-			//例外内容
-			if(instancePlace == null) {
-				System.out.println("<error>クラスパスが指定されていません。");
-			}else {
-				System.out.println("<error>指定されたクラスパスが見つかりませんでした。（" + instancePlace + "が見つかりません。）");
-			}
-		}catch (Exception e) {
-			//スタックトレース
-			e.printStackTrace();
-		}
-
-		return cams;
-	}
 
 	/**
 	 * Actionクラス生成メソッド
@@ -253,7 +214,7 @@ public class ApplicationContainerImplemention implements ApplicationContainer{
 				//ログ発生箇所
 				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 				//処理内容
-				System.out.println("フィールドの@Service確認中");
+				System.out.println("フィールドのアノテーションを確認中");
 				//@Serviceがついている場合、ビジネスロジックを取得し、インジェクト
 				if(f.isAnnotationPresent(Service.class)) {
 					//ログ発生箇所
@@ -282,6 +243,12 @@ public class ApplicationContainerImplemention implements ApplicationContainer{
 					System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 					//処理内容
 					System.out.println(f.getName() + "に@FormInjectionが付与されているのを確認しました。");
+
+	            	//ログ発生箇所
+					System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+					//処理内容
+					System.out.println(f.getName() + "のFormインスタンスを生成します。");
+					Object bean = generator(f.getName());
 
 					//ログ発生箇所
 					System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -425,3 +392,46 @@ public class ApplicationContainerImplemention implements ApplicationContainer{
 	}
 
 }
+
+//バインディング用オブジェクト取得メソッド
+/*
+public InstanceAndClassObjectforServlet getCAMS(String instanceName) {
+	//ログ発生箇所
+	System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+	//処理内容
+	System.out.println("getCAMSメソッドを実行します。");
+
+	InstanceAndClassObjectforServlet cams = new InstanceAndClassObjectforServlet();
+	//インスタンス名からクラスパスを取得
+	instancePlace = beanDefinitions.get(instanceName);
+
+	try {
+		//インスタンスの作成
+		Class<?> instanceClass = Class.forName(instancePlace);
+		bean = instanceClass.getDeclaredConstructor().newInstance();
+		//camsにインスタンスを格納
+		cams.setObj(bean);
+		//camsにメソッドを格納
+		cams.setClazz(instanceClass);
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println("指定されたクラスパスのBean生成が完了しました。");
+	} catch (ClassNotFoundException e) {
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//例外内容
+		if(instancePlace == null) {
+			System.out.println("<error>クラスパスが指定されていません。");
+		}else {
+			System.out.println("<error>指定されたクラスパスが見つかりませんでした。（" + instancePlace + "が見つかりません。）");
+		}
+	}catch (Exception e) {
+		//スタックトレース
+		e.printStackTrace();
+	}
+
+	return cams;
+}
+*/
+

@@ -11,6 +11,7 @@ import annotation.SessionScoped;
 @SessionScoped
 public class TestA {
 
+	//@CookieScoped
 	private String str1;
 
 	private String str2;

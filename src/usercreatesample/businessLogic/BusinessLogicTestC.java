@@ -31,4 +31,10 @@ public class BusinessLogicTestC implements BusinessLogic{
 
 	}
 
+	@Override
+	public void login(String a, String b) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
 }

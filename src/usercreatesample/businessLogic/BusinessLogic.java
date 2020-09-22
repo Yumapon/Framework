@@ -15,4 +15,6 @@ public interface BusinessLogic {
 
 	boolean login(String pass);
 
+	void login(String a, String b);
+
 }

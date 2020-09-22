@@ -1,8 +1,6 @@
 import org.junit.Before;
-import org.junit.Test;
 
 import container.ApplicationContainerImplemention;
-import container.InstanceAndClassObjectforServlet;
 
 public class JunitContainerTest {
 
@@ -27,11 +25,5 @@ public class JunitContainerTest {
 		System.out.println(testB.getA());
 	}
 	*/
-
-	@Test
-	public void test3() {
-		InstanceAndClassObjectforServlet cams = ac.getCAMS("TestA");
-		System.out.println(cams.getObj());
-	}
 
 }
