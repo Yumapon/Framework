@@ -3,6 +3,8 @@ package transactionManager;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import annotation.Transactional;
+
 public class TransactionHandler implements InvocationHandler {
 
 	//BusinessLogicの実装クラス
@@ -28,10 +30,16 @@ public class TransactionHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		System.out.println("Proxyクラスの処理を開始します。");
+
 		//トランザクションの開始
-		transactionID = tm.beginTransaction();
+		if(target.getClass().isAnnotationPresent(Transactional.class) || target.getClass().getMethod(method.getName(), method.getParameterTypes()).isAnnotationPresent(Transactional.class)) {
+			transactionID = tm.beginTransaction();
+		}
 		/*
-		 *トランザクションが正常に開始された場合
+		 *トランザクションが正常に開始された場合(@Transactionalが付与されていた場合)
 		 *transactionIDを渡し、トランザクションを確保する。
 		 */
 		if (tm.isTransaction()) {
@@ -52,9 +60,14 @@ public class TransactionHandler implements InvocationHandler {
 			ret = method.invoke(target, args);
 			return ret;
 		} finally {
+			if(tm.isTransaction()) {
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				System.out.println("トランザクションを終了し、コネクションも返却します。");
+				tm.endTransaction();
+			}
+
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-			System.out.println("トランザクションを終了し、コネクションも返却します。");
-			tm.endTransaction();
+			System.out.println("Proxyクラスの処理を終了します。");
 		}
 	}
 

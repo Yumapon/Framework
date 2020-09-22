@@ -3,12 +3,12 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-import container.ApplicationContainer;
+import container.ApplicationContainerImplemention;
 import container.InstanceAndClassObjectforServlet;
 
 public class JunitgetActionTest {
 
-	ApplicationContainer ac = new ApplicationContainer();
+	ApplicationContainerImplemention ac = new ApplicationContainerImplemention();
 
 	@Test
 	public void getActionTest() {

@@ -1,5 +1,6 @@
 package usercreatesample.businessLogic;
 
+import annotation.Transactional;
 import usercreatesample.beans.TestA;
 
 /**
@@ -7,6 +8,8 @@ import usercreatesample.beans.TestA;
  * @author okamotoyuuma
  *
  */
+
+@Transactional
 public class BusinessLogicTestA implements BusinessLogic{
 
 	@Override
@@ -21,9 +24,16 @@ public class BusinessLogicTestA implements BusinessLogic{
 	}
 
 	@Override
+	//@Transactional
 	public boolean login(String pass) {
 		System.out.println("ビジネスロジックのメソッドが実行されました！！！！");
 		return false;
+	}
+
+	@Override
+	//@Transactional
+	public void login(String a, String b) {
+		System.out.println("ビジネスロジックのメソッドが実行されました！！！！");
 	}
 
 }

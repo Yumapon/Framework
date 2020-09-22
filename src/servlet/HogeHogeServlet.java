@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import annotation.ActionMethod;
 import annotation.SessionScoped;
 import container.ApplicationContainer;
+import container.ApplicationContainerImplemention;
 import container.InstanceAndClassObjectforServlet;
 import exception.IlligalMethodNameException;
 
@@ -31,7 +32,13 @@ public class HogeHogeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	//コンテナ生成
-	ApplicationContainer ac = new ApplicationContainer();
+	ApplicationContainer ac = (ApplicationContainer) new ApplicationContainerImplemention();
+
+	//Action格納用Object
+	InstanceAndClassObjectforServlet iaco;
+
+	//RequestのParameterName格納用配列
+	ArrayList<String> paraNameList = new ArrayList<>();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -48,26 +55,46 @@ public class HogeHogeServlet extends HttpServlet {
 
 		//バインディングするBean名(Form名)を取得 formはからでもOK
 		Optional<String> formNameOpt = Optional.ofNullable(request.getParameter("formName"));
-		//Actionクラスを取得
+		//Actionクラス名を取得
 		String actionName= request.getParameter("actionName");
 		//実行するメソッド名を取得
 		String actionMethodName = request.getParameter("actionMethodName");
 
-		//Servlet用Beanクラスを生成(formNameが指定されている場合のみ)
-		formNameOpt.ifPresent(formName -> createFormBean(formName, request));
+		//Requestから送られてきたParameterNameを全て取得する
+		paraNameList.clear();
+		Enumeration<?> e = request.getParameterNames();
+		while (e.hasMoreElements()) {
+			String name = (String) e.nextElement();
+			paraNameList.add(name);
+		}
 
-		//上記まででインスタンスの生成は完了しているので、ここからActionを作成していく！
+		//formName.actionName.actionMethodは必要ないので削除
+		//formNameは格納されていない可能性があるので、格納されている場合のみ削除
+		int index = paraNameList.indexOf("formName");
+		if(index != (-1)) {
+			paraNameList.remove(index);
+		}
+		paraNameList.remove(paraNameList.indexOf("actionName"));
+		paraNameList.remove(paraNameList.indexOf("actionMethodName"));
+		paraNameList.remove(paraNameList.indexOf("button"));
 
-		//Servlet用ActionClassを取得
-		InstanceAndClassObjectforServlet cams2 = ac.getAction(actionName);
+		//Actionクラスを取得
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println("Actionクラスを取得します。");
+		iaco = ac.getAction(actionName);
 
-		//ActionClassの実行したいMethodを取得し、実行
-		Class<?> clazz = cams2.getClazz();
+		//Actionクラス内のFormBeanクラスにリクエストの値をセット(formNameが指定されている場合のみ)
+		formNameOpt.ifPresent(formName -> setFormBean(formName, request));
+
+		//ActionClass内の指定されたMethodを取得し、実行
+		Class<?> clazz = iaco.getClazz();
 		Method[] methods = clazz.getMethods();
 
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-		//例外内容
+		//処理内容
 		System.out.println("実行するメソッドを探しています。");
 		//実行できたか確認するフラグ
 		boolean invokeMethodCheck = false;
@@ -85,10 +112,50 @@ public class HogeHogeServlet extends HttpServlet {
 						System.out.print("実行するメソッドが見つかりました。実行します 実行するメソッド：");
 						System.out.println(m2.getName());
 
-						String urlAndMethodStr = (String) m2.invoke(cams2.getObj());
-
 						//遷移先URLとメソッド（forword or redirect）を取得
+						String urlAndMethodStr = (String) m2.invoke(iaco.getObj());
 						String[] urlAndMethod = urlAndMethodStr.split(" : ", 0);
+
+						//ログ発生箇所
+						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+						//処理内容
+						System.out.println("InstanceScopeを確認しています");
+
+						for(Field f : clazz.getDeclaredFields()) {
+							f.setAccessible(true);
+							Object field = f.get(iaco.getObj());
+							f.setAccessible(false);
+
+							//Sessionの格納
+							if(field.getClass().isAnnotationPresent(SessionScoped.class)) {
+								//ログ発生箇所
+								System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+								//例外内容
+								System.out.println("Sessionにインスタンスを格納します。" + "インスタンス名：" + f.getName());
+								HttpSession session = request.getSession(true);
+								Object obj = iaco.getObj();
+								session.setAttribute(f.getName(), obj);
+							}
+
+							/*
+							//Cookieの格納
+							for(Field f1 : field.getClass().getDeclaredFields()) {
+								//ログ発生箇所
+								System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+								//例外内容
+								System.out.println("Cookieにインスタンスを格納します。" + "フィールド名：" + f1.getName());
+								if(f1.isAnnotationPresent(CookieScoped.class)) {
+
+									f.setAccessible(true);
+									Object obj = f1.get(field);
+									f.setAccessible(false);
+
+									Cookie cookie = new Cookie(f1.getName(), obj.toString());
+									response.addCookie(cookie);
+								}
+							}
+							*/
+						}
 
 						invokeMethodCheck = true;
 
@@ -124,96 +191,64 @@ public class HogeHogeServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
+
 		doGet(request, response);
 	}
 
 	/**
-	 * Bean生成メソッド
+	 * Beanにリクエストパラメータをセットするメソッド
 	 */
-	private void createFormBean(String formName, HttpServletRequest request) {
+	private void setFormBean(String formName, HttpServletRequest request) {
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println(formName + "に値をセットします。");
 
-		InstanceAndClassObjectforServlet cams = ac.getCAMS(formName);
+		//リクエストの値をセットするBeanのインスタンスを取得
+		//Actionクラス
+		Class<?> clazz = iaco.getClazz();
 
-		//Beanのインスタンス取得
-		Object form = cams.getObj();
+		System.out.println("------ActionClassのField------");
+		for(Field f1 : clazz.getDeclaredFields()) {
+			System.out.println(f1.getName());
+		}
+		System.out.println("------------------------------");
 
-		//Beanのライフタイムがセッションスコープであれば、セッションに格納する
-		if (cams.getClazz().isAnnotationPresent(SessionScoped.class)) {
-			//ログ発生箇所
-			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-			//例外内容
-			System.out.println("セッションにBeanを格納します。" + "Bean名：" + formName);
-			HttpSession session = request.getSession(true);
-			session.setAttribute(formName, form);
+		//Actionクラス内のFormクラス
+		Field formField = null;
+		try {
+			formField = clazz.getDeclaredField(formName);
+		} catch (NoSuchFieldException | SecurityException e2) {
+			e2.printStackTrace();
 		}
 
-		//RequestのParameterName格納用配列
-		ArrayList<String> paraNameList = new ArrayList<>();
-
-		//Requestから送られてきたParameterNameを全て取得する
-		Enumeration<?> e = request.getParameterNames();
-		while (e.hasMoreElements()) {
-			String name = (String) e.nextElement();
-			paraNameList.add(name);
+		Object form = null;
+		try {
+			formField.setAccessible(true);
+			form = formField.get(iaco.getObj());
+			formField.setAccessible(false);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
 		}
 
-		//formName.actionName.actionMethodは必要ないので削除
-		paraNameList.remove(paraNameList.indexOf("formName"));
-		paraNameList.remove(paraNameList.indexOf("actionName"));
-		paraNameList.remove(paraNameList.indexOf("actionMethodName"));
-		paraNameList.remove(paraNameList.indexOf("button"));
-
-		//setメソッドを実行してインスタンスに値を格納
-		/*
-		String paraName;
-		Method m = null;
-		for (int i = 0; i < (paraNameList.size() - 1); i++) {
-			paraName = paraNameList.get(i);
-			String setMethodName = "set" + paraName.substring(0, 1).toUpperCase() + paraName.substring(1).toLowerCase();
-
-			try {
-				//setMethodを取得
-				loop: for (Method method : cams.getClazz().getMethods()) {
-				      for (Class<?> p : method.getParameterTypes()) {
-		　		    	  if(setMethodName.equals(method.getName())) {
-				    		  if(p.getName().contains("String")) {
-				    			  m = cams.getClazz().getMethod(setMethodName, String.class);
-				    			  //Setメソッドは引数が絶対に１つなハズなので、これでOK
-				    			  m.invoke(form, request.getParameter(paraName));
-				    			  break loop;
-				    		  }else if(p.getName().contains("int")) {
-				    			  m = cams.getClazz().getMethod(setMethodName, int.class);
-				    			  m.invoke(form, Integer.parseInt(request.getParameter(paraName)));
-				    			  break loop;
-				    		  }
-				    	  }
-				      }
-				    }
-
-
-			} catch (NoSuchMethodException | SecurityException e1) {
-				//ログ発生箇所
-				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-				//例外内容
-				System.out.println("システムエラー：セットメソッドが見つかりません。");
-				e1.printStackTrace();
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-				// TODO 自動生成された catch ブロック
-				e1.printStackTrace();
-			}
+		//確認用
+		System.out.println("-------FormClassのField-------");
+		for(Field f : form.getClass().getDeclaredFields()) {
+			System.out.println(f.getName());
 		}
-		*/
+		System.out.println("------------------------------");
 
 		//Fieldにリクエストの値をセット
+		System.out.println("-------リクエストパラメータ-------");
 		String paraName;
 		for (int i = 0; i < paraNameList.size(); i++) {
 			//リクエストパラメータの属性値を取得
 			paraName = paraNameList.get(i);
+			System.out.print(paraName + " : ");
 
 			try {
 				//リクエストパラメータと合致するFieldを取得
-				Field f = cams.getClazz().getDeclaredField(paraName);
+				Field f = form.getClass().getDeclaredField(paraName);
 
 				//Fieldに値をセット
 				f.setAccessible(true);//無理やり書き込む。
@@ -262,6 +297,66 @@ public class HogeHogeServlet extends HttpServlet {
 				e1.printStackTrace();
 			}
 		}
+		System.out.println("------------------------------");
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println(formName + "への値のセットが完了しました。");
 	}
 
 }
+
+//setメソッドを実行してインスタンスに値を格納
+/*
+String paraName;
+Method m = null;
+for (int i = 0; i < (paraNameList.size() - 1); i++) {
+	paraName = paraNameList.get(i);
+	String setMethodName = "set" + paraName.substring(0, 1).toUpperCase() + paraName.substring(1).toLowerCase();
+
+	try {
+		//setMethodを取得
+		loop: for (Method method : cams.getClazz().getMethods()) {
+		      for (Class<?> p : method.getParameterTypes()) {
+　		    	  if(setMethodName.equals(method.getName())) {
+		    		  if(p.getName().contains("String")) {
+		    			  m = cams.getClazz().getMethod(setMethodName, String.class);
+		    			  //Setメソッドは引数が絶対に１つなハズなので、これでOK
+		    			  m.invoke(form, request.getParameter(paraName));
+		    			  break loop;
+		    		  }else if(p.getName().contains("int")) {
+		    			  m = cams.getClazz().getMethod(setMethodName, int.class);
+		    			  m.invoke(form, Integer.parseInt(request.getParameter(paraName)));
+		    			  break loop;
+		    		  }
+		    	  }
+		      }
+		    }
+
+
+	} catch (NoSuchMethodException | SecurityException e1) {
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//例外内容
+		System.out.println("システムエラー：セットメソッドが見つかりません。");
+		e1.printStackTrace();
+	} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+		// TODO 自動生成された catch ブロック
+		e1.printStackTrace();
+	}
+}
+*/
+
+
+//Beanのライフタイムがセッションスコープであれば、セッションに格納する
+/*
+if (iaco.getClazz().isAnnotationPresent(SessionScoped.class)) {
+	//ログ発生箇所
+	System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+	//例外内容
+	System.out.println("セッションにBeanを格納します。" + "Bean名：" + formName);
+	HttpSession session = request.getSession(true);
+	session.setAttribute(formName, form);
+}
+*/
+

@@ -4,6 +4,7 @@ import annotation.ActionMethod;
 import annotation.FormInjection;
 import annotation.Service;
 import usercreatesample.beans.TestA;
+import usercreatesample.beans.TestB;
 import usercreatesample.businessLogic.BusinessLogic;
 /**
  * 動作確認用クラス
@@ -18,6 +19,13 @@ public class ActionTestA {
 	@FormInjection
 	TestA testA;
 
+	@FormInjection
+	TestB testB;
+
+	/*
+	@FormInjection
+	TestB testb;
+	*/
 
 	@ActionMethod("testMethod")
 	public String actionMethod() {

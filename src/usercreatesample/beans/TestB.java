@@ -7,17 +7,17 @@ package usercreatesample.beans;
  */
 public class TestB {
 
-	int a;
+	long a;
 
 	int b;
 
 	String c;
 
-	public int getA() {
+	public long getA() {
 		return a;
 	}
 
-	public void setA(int a) {
+	public void setA(long a) {
 		this.a = a;
 	}
 

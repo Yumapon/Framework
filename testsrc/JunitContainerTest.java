@@ -1,17 +1,15 @@
 import org.junit.Before;
-import org.junit.Test;
 
-import container.ApplicationContainer;
-import container.InstanceAndClassObjectforServlet;
+import container.ApplicationContainerImplemention;
 
 public class JunitContainerTest {
 
-	ApplicationContainer ac;
+	ApplicationContainerImplemention ac;
 
 	@Before
 	public void setUp(){
 		//引数なしコンストラクタでの生成
-		ac = new ApplicationContainer();
+		ac = new ApplicationContainerImplemention();
 	}
 
 	//@Test
@@ -27,11 +25,5 @@ public class JunitContainerTest {
 		System.out.println(testB.getA());
 	}
 	*/
-
-	@Test
-	public void test3() {
-		InstanceAndClassObjectforServlet cams = ac.getCAMS("TestA");
-		System.out.println(cams.getObj());
-	}
 
 }
