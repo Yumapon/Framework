@@ -1,7 +1,7 @@
-!!container.BeanDefinition
-name: testA
-type: usercreatesample.beans.TestA
----
+!!container.BeanDefinition #Bean定義設定クラスのパス
+name: testA #Beanクラスの呼び出し名
+type: usercreatesample.beans.TestA #Beanクラスのパス
+--- #区切り
 !!container.BeanDefinition
 name: testB
 type: usercreatesample.beans.TestB

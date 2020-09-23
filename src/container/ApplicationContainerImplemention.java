@@ -154,16 +154,15 @@ public class ApplicationContainerImplemention implements ApplicationContainer{
 	/**
 	 * Actionクラス生成メソッド
 	 * @param actionName
-	 * @return InstanceAndClassObjectforServlet
+	 * @return Object
 	 */
-	public InstanceAndClassObjectforServlet getAction(String actionName) {
+	public Object getAction(String actionName) {
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//処理内容
 		System.out.println("getActionメソッドを実行します。");
 
 		Object actionObj = null;
-		InstanceAndClassObjectforServlet cams = new InstanceAndClassObjectforServlet();
 
 		//actionNameからクラスの場所を取得
 		//ログ発生箇所
@@ -266,10 +265,6 @@ public class ApplicationContainerImplemention implements ApplicationContainer{
 	            }
 	        }
 
-			//サーブレットに送る用のオブジェクトに格納
-			cams.setClazz(actionClazz);
-			cams.setObj(actionObj);
-
 		} catch (ClassNotFoundException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
@@ -279,7 +274,7 @@ public class ApplicationContainerImplemention implements ApplicationContainer{
 			e.printStackTrace();
 		}
 
-		return cams;
+		return actionObj;
 	}
 
 	/**

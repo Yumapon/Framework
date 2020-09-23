@@ -10,6 +10,6 @@ public interface ApplicationContainer {
 
 	//InstanceAndClassObjectforServlet getCAMS(String instanceName);
 
-	InstanceAndClassObjectforServlet getAction(String actionName);
+	Object getAction(String actionName);
 
 }

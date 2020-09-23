@@ -10,7 +10,7 @@ public interface Repository<T, ID>{
 	 */
 
 	//指定されたエンティティを保存します。
-	T save(T entity);
+	void save(T entity);
 
 	//指定された ID で識別されるエンティティを返します。
 	Optional<T> findById(ID primaryKey);

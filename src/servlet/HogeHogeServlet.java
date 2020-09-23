@@ -21,7 +21,6 @@ import annotation.ActionMethod;
 import annotation.SessionScoped;
 import container.ApplicationContainer;
 import container.ApplicationContainerImplemention;
-import container.InstanceAndClassObjectforServlet;
 import exception.IlligalMethodNameException;
 
 /**
@@ -35,7 +34,7 @@ public class HogeHogeServlet extends HttpServlet {
 	ApplicationContainer ac = (ApplicationContainer) new ApplicationContainerImplemention();
 
 	//Action格納用Object
-	InstanceAndClassObjectforServlet iaco;
+	Object actionObj;
 
 	//RequestのParameterName格納用配列
 	ArrayList<String> paraNameList = new ArrayList<>();
@@ -45,7 +44,6 @@ public class HogeHogeServlet extends HttpServlet {
 	 */
 	public HogeHogeServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -83,13 +81,13 @@ public class HogeHogeServlet extends HttpServlet {
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//処理内容
 		System.out.println("Actionクラスを取得します。");
-		iaco = ac.getAction(actionName);
+		actionObj = ac.getAction(actionName);
 
 		//Actionクラス内のFormBeanクラスにリクエストの値をセット(formNameが指定されている場合のみ)
 		formNameOpt.ifPresent(formName -> setFormBean(formName, request));
 
 		//ActionClass内の指定されたMethodを取得し、実行
-		Class<?> clazz = iaco.getClazz();
+		Class<?> clazz = actionObj.getClass();
 		Method[] methods = clazz.getMethods();
 
 		//ログ発生箇所
@@ -113,7 +111,7 @@ public class HogeHogeServlet extends HttpServlet {
 						System.out.println(m2.getName());
 
 						//遷移先URLとメソッド（forword or redirect）を取得
-						String urlAndMethodStr = (String) m2.invoke(iaco.getObj());
+						String urlAndMethodStr = (String) m2.invoke(actionObj);
 						String[] urlAndMethod = urlAndMethodStr.split(" : ", 0);
 
 						//ログ発生箇所
@@ -123,7 +121,7 @@ public class HogeHogeServlet extends HttpServlet {
 
 						for(Field f : clazz.getDeclaredFields()) {
 							f.setAccessible(true);
-							Object field = f.get(iaco.getObj());
+							Object field = f.get(actionObj);
 							f.setAccessible(false);
 
 							//Sessionの格納
@@ -133,7 +131,7 @@ public class HogeHogeServlet extends HttpServlet {
 								//例外内容
 								System.out.println("Sessionにインスタンスを格納します。" + "インスタンス名：" + f.getName());
 								HttpSession session = request.getSession(true);
-								Object obj = iaco.getObj();
+								Object obj = actionObj;
 								session.setAttribute(f.getName(), obj);
 							}
 
@@ -206,7 +204,7 @@ public class HogeHogeServlet extends HttpServlet {
 
 		//リクエストの値をセットするBeanのインスタンスを取得
 		//Actionクラス
-		Class<?> clazz = iaco.getClazz();
+		Class<?> clazz = actionObj.getClass();
 
 		System.out.println("------ActionClassのField------");
 		for(Field f1 : clazz.getDeclaredFields()) {
@@ -225,7 +223,7 @@ public class HogeHogeServlet extends HttpServlet {
 		Object form = null;
 		try {
 			formField.setAccessible(true);
-			form = formField.get(iaco.getObj());
+			form = formField.get(actionObj);
 			formField.setAccessible(false);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
@@ -341,7 +339,6 @@ for (int i = 0; i < (paraNameList.size() - 1); i++) {
 		System.out.println("システムエラー：セットメソッドが見つかりません。");
 		e1.printStackTrace();
 	} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-		// TODO 自動生成された catch ブロック
 		e1.printStackTrace();
 	}
 }
