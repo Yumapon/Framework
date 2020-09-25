@@ -5,7 +5,7 @@ import exception.AlreadyTransactionBeganException;
 public interface TransactionManager {
 
 	//トランザクションの開始
-	String beginTransaction() throws AlreadyTransactionBeganException;
+	void beginTransaction() throws AlreadyTransactionBeganException;
 
 	//ロールバック
 	void rollback();

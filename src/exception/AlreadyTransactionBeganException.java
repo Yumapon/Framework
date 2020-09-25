@@ -1,5 +1,5 @@
 package exception;
 
-public class AlreadyTransactionBeganException extends Exception {
+public class AlreadyTransactionBeganException extends RuntimeException {
 
 }

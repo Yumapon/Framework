@@ -8,6 +8,7 @@ import db_access.DBAccess;
 import exception.AlreadyTransactionBeganException;
 import exception.DoNotHaveDBAccessException;
 import exception.NoDBAccessException;
+import exception.notBeginTransactionException;
 
 public class DefaultTransactionManager implements TransactionManager {
 
@@ -30,9 +31,9 @@ public class DefaultTransactionManager implements TransactionManager {
 
 	@Override
 	//トランザクションの開始メソッド
-	public String beginTransaction() throws AlreadyTransactionBeganException {
+	public void beginTransaction() throws AlreadyTransactionBeganException {
 		//すでにトランザクション開始されている場合は、実行時にエラーを吐く
-		if(transactionStatus) {
+		if (transactionStatus) {
 			throw new AlreadyTransactionBeganException();
 		}
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -44,7 +45,7 @@ public class DefaultTransactionManager implements TransactionManager {
 		long threadID = currentThread.getId();
 		transactionID = String.valueOf(threadID);
 
-		return transactionID;
+		getConnection(transactionID);
 	}
 
 	@Override
@@ -68,17 +69,16 @@ public class DefaultTransactionManager implements TransactionManager {
 	@Override
 	//トランザクションの終了メソッド
 	public void endTransaction() {
-		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-		System.out.println("トランザクションを終了します");
-		try {
-			if(conn != null) {
+		if(this.isTransaction()) {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("トランザクションを終了します");
+			try {
 				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 				System.out.println("DBへ結果をCOMMITします");
-				conn = dba.getConnection();
-				conn.commit();
+				cp.getDBAccess(transactionID).getConnection().commit();
+			} catch (notBeginTransactionException | SQLException e) {
+				e.printStackTrace();
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 		//TransactionStatusを終了状態に
 		transactionStatus = false;
@@ -92,7 +92,7 @@ public class DefaultTransactionManager implements TransactionManager {
 		if (this.isTransaction()) {
 			//Connectionの確保
 			try {
-				dba = cp.getDBAccess(transactionID);
+				cp.checkoutDBAccess(transactionID);
 			} catch (NoDBAccessException e) {
 				if (!repeat) {
 					//時間をおいてもう一度アクセス

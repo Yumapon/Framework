@@ -36,20 +36,13 @@ public class TransactionHandler implements InvocationHandler {
 
 		//トランザクションの開始
 		if(target.getClass().isAnnotationPresent(Transactional.class) || target.getClass().getMethod(method.getName(), method.getParameterTypes()).isAnnotationPresent(Transactional.class)) {
-			transactionID = tm.beginTransaction();
-		}
-		/*
-		 *トランザクションが正常に開始された場合(@Transactionalが付与されていた場合)
-		 *transactionIDを渡し、トランザクションを確保する。
-		 */
-		if (tm.isTransaction()) {
+			tm.beginTransaction();
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 			System.out.println("トランザクションは開始されました。");
-			tm.getConnection(transactionID);
 
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-			System.out.println("transactionID:" + transactionID + "で、データベースの確保を行いました。");
-		} else {
+			System.out.println("データベースの確保を行いました。");
+		}else {
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 			System.out.println("トランザクションは開始されていません。");
 		}

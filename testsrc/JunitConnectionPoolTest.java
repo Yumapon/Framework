@@ -3,8 +3,10 @@ import org.junit.Test;
 
 import db_access.ConnectionPool;
 import db_access.DBAccess;
-import exception.DoNotHaveDBAccessException;
-import exception.NoDBAccessException;
+import exception.AlreadyTransactionBeganException;
+import exception.notBeginTransactionException;
+import transactionManager.DefaultTransactionManager;
+import transactionManager.TransactionManager;
 
 public class JunitConnectionPoolTest {
 
@@ -19,68 +21,20 @@ public class JunitConnectionPoolTest {
 	}
 
 	@Test
-	public void test() {
+	public void test() throws notBeginTransactionException, AlreadyTransactionBeganException {
 		//インスタンスが取得できるか確認
 		ConnectionPool cp = ConnectionPool.getInstance();
-		//DBAccessが取得できるかのテスト
-		try {
-			@SuppressWarnings("unused")
-			DBAccess  dba1;
-			int i = 1;
-			while(i < 4) {
-				dba1 = cp.getDBAccess("" + i);
-				i++;
-			}
-			i = 1;
-			while(i < 4) {
-				try {
-					cp.returnDBAccess("" + i);
-				} catch (DoNotHaveDBAccessException e) {
-					// TODO 自動生成された catch ブロック
-					e.printStackTrace();
-				}
-				i++;
-			}
-			i = 1;
-			while(i < 4) {
-				dba1 = cp.getDBAccess("" + i);
-				i++;
-			}
-			i = 1;
-			while(i < 4) {
-				try {
-					cp.returnDBAccess("" + i);
-				} catch (DoNotHaveDBAccessException e) {
-					// TODO 自動生成された catch ブロック
-					e.printStackTrace();
-				}
-				i++;
-			}
-			i = 1;
-			while(i < 4) {
-				try {
-					cp.returnDBAccess("" + i);
-				} catch (DoNotHaveDBAccessException e) {
-					System.out.println("DoNotHaveDBAccessExceptionが発生しました。");
-				}
-				i++;
-			}
-			i = 1;
-			while(i < 100) {
-				dba1 = cp.getDBAccess("" + i);
-				try {
-					cp.returnDBAccess("" + i);
-				} catch (DoNotHaveDBAccessException e) {
-					System.out.println("DoNotHaveDBAccessExceptionが発生しました。");
-				}
-				i++;
-			}
+		TransactionManager tm = new DefaultTransactionManager();
+		tm.beginTransaction();
 
+		@SuppressWarnings("unused")
+		DBAccess dba1;
+		int i = 1;
 
-		} catch (NoDBAccessException e) {
-			System.out.print("NoDBAccessExceptionが発生しました。");
-		}
+		dba1 = cp.getDBAccess("" + i);
+		tm.endTransaction();
+
+		dba1 = cp.getDBAccess("" + i);
 
 	}
-
 }

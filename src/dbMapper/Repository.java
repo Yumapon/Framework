@@ -1,5 +1,6 @@
 package dbMapper;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 //TにはEntityクラスの型を、IDにはPrimaryKeyを記載する
@@ -13,10 +14,10 @@ public interface Repository<T, ID>{
 	void save(T entity);
 
 	//指定された ID で識別されるエンティティを返します。
-	Optional<T> findById(ID primaryKey);
+	T findById(ID primaryKey);
 
 	//すべてのエンティティを返します。
-	Iterable<T> findAll();
+	ArrayList<T> findAll();
 
 	//エンティティの数を返します。
 	long count();

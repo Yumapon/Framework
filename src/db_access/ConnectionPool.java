@@ -9,6 +9,7 @@ import container.DBConfig;
 import container.EnvironmentConfigReader;
 import exception.DoNotHaveDBAccessException;
 import exception.NoDBAccessException;
+import exception.notBeginTransactionException;
 
 public class ConnectionPool implements Serializable {
 
@@ -51,8 +52,8 @@ public class ConnectionPool implements Serializable {
         private static final ConnectionPool INSTANCE = new ConnectionPool();
     }
 
-	//DBAccessを外部に渡すメソッド
-	public DBAccess getDBAccess(String transactionID) throws NoDBAccessException {
+	//DBAccessをチェックアウトする
+	public void checkoutDBAccess(String transactionID) throws NoDBAccessException {
 		String connectionKey = null;
 		dba = null;
 		for (int i = 0; i < NUMBER_OF_DB_CONNECTIONS; i++) {
@@ -69,13 +70,29 @@ public class ConnectionPool implements Serializable {
 		}
 		if (dba != null) {
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-			System.out.println("transactionID＝" + transactionID + "にコネクションを貸し出します。");
-			return dba;
+			System.out.println("transactionID＝" + transactionID + "にコネクションをチェックアウトしました");
 		} else {
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-			System.out.println("コネクションは全て使用中です。");
+			System.out.println("コネクションが全て使用中か、Tramsactionが開始されていません。");
 			throw new NoDBAccessException();
 		}
+	}
+
+	/*
+	 * TransactionManager以外が使用する、コネクション取得メソッド
+	 */
+	public DBAccess getDBAccess(String transactionID) throws notBeginTransactionException {
+		dba = null;
+		if(connectionPool.containsKey(transactionID)) {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("コネクションを貸し出しました");
+			dba = connectionPool.get(transactionID);
+		}else {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("トランザクションが開始されていない可能性があります");
+			throw new notBeginTransactionException();
+		}
+		return dba;
 	}
 
 	//DBAccessを返してもらうメソッド
