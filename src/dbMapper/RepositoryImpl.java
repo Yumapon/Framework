@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import annotation.Table;
@@ -215,25 +214,9 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 		//SQLを実行
 		ResultSet result = query.executeQuery(sql);
 
-		//リストにデータを追加する
-		List<Object> list = new ArrayList<>();
-		try {
-			while (result.next()) {
-			    list.add(result.getObject(idName));
-			}
-		} catch (SQLException e2) {
-			e2.printStackTrace();
-		}
-
-		//リストがからの場合、nullを返却する
-		if(list.isEmpty()){
-			entityOpt = Optional.empty();
-		    return entityOpt;
-		}
-
 		//resultから値を取得
 		try {
-			entity = (T)this.entityType.getDeclaredConstructor().newInstance();
+			entity = (T) this.entityType.getDeclaredConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e1) {
 			e1.printStackTrace();
@@ -242,17 +225,20 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 		try {
 			//ResultSetのカーソルを先頭に持ってくる
 			result.beforeFirst();
-			result.next();
-			for (String column : columnNames) {
-				Object columnValue = result.getObject(column);
-				f = entity.getClass().getDeclaredField(column);
-				f.setAccessible(true);
-				f.set(entity, columnValue);
-				f.setAccessible(false);
-			}
+			if (result.next()) {
+				for (String column : columnNames) {
+					Object columnValue = result.getObject(column);
+					f = entity.getClass().getDeclaredField(column);
+					f.setAccessible(true);
+					f.set(entity, columnValue);
+					f.setAccessible(false);
+				}
 
-			//Entityをオプショナル型に変換
-			entityOpt = Optional.of(entity);
+				//Entityをオプショナル型に変換
+				entityOpt = Optional.of(entity);
+			}else {
+				entityOpt = Optional.empty();
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -273,8 +259,53 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 		//QueryInfoの初期化
 		qi.clearQueryInfo();
 
+		//Entity格納用
+		ArrayList<T> list = new ArrayList<>();
+
+		//Entity
+		T entity = null;
+
 		//SQL文を発行
-		//String sql = query.createSelectSql(entityType);
+		String sql = query.createSelectSql(qi);
+
+		//SQLを実行
+		ResultSet result = query.executeQuery(sql);
+
+		//resultから値を取得
+		Field f;
+		try {
+			while(result.next()) {
+				entity = (T) this.entityType.getDeclaredConstructor().newInstance();
+				for (String column : columnNames) {
+					Object columnValue = result.getObject(column);
+					f = entity.getClass().getDeclaredField(column);
+					f.setAccessible(true);
+					f.set(entity, columnValue);
+					f.setAccessible(false);
+				}
+				list.add(entity);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoSuchFieldException | SecurityException e) {
+			e.printStackTrace();
+		}  catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+
+		//return result;
+		return list;
+	}
+
+	@Override
+	public ArrayList<T> findAll(QueryInfo qi) {
+		//QueryInfoの初期化
+		qi.clearQueryInfo();
+
+		//SQL文を発行
+		String sql = query.createSelectSql(qi);
 
 		//SQLを実行
 		//ArrayList<T> result = query.selectExecute(sql);

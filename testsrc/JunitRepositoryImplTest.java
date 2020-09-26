@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -112,6 +113,7 @@ public class JunitRepositoryImplTest {
 		System.out.println(i);
 	}
 
+	@Ignore
 	@Test
 	public void test5() {
 		Optional<User_id> entity = repos.findById(121212);
@@ -129,6 +131,24 @@ public class JunitRepositoryImplTest {
 			System.out.println(entityty.getPassword());
 		}else
 			System.out.println("ないです。。");
+	}
+
+	@Test
+	public void test6() {
+		ArrayList<User_id> list = repos.findAll();
+		for(User_id e : list) {
+			System.out.println(e.getId());
+			System.out.println(e.getPassword());
+		}
+
+		ArrayList<Task_list> list2 = repos2.findAll();
+		for(Task_list e : list2) {
+			System.out.println(e.getNum());
+			System.out.println(e.getContent());
+			System.out.println(e.getName());
+			System.out.println(e.getClient());
+			System.out.println(e.getDeadline());
+		}
 	}
 
 }

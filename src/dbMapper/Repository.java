@@ -3,6 +3,8 @@ package dbMapper;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import query.QueryInfo;
+
 //TにはEntityクラスの型を、IDにはPrimaryKeyを記載する
 public interface Repository<T, ID>{
 
@@ -18,6 +20,9 @@ public interface Repository<T, ID>{
 
 	//すべてのエンティティを返します。
 	ArrayList<T> findAll();
+
+	//指定された条件のエンティティを返します。
+	ArrayList<T> findAll(QueryInfo qi);
 
 	//エンティティの数を返します。
 	int count();
