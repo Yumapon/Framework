@@ -114,7 +114,12 @@ public class EntityGeneratorImplements implements EntityGenerator{
     			pw.println("		this." + colum[1] + " = " + colum[1] + ";");
     			pw.println(" 	}");
     			pw.println("");
+
     			//Getter宣言
+    			pw.println("	public " + colum[0] + " get" + colum[1].substring(0, 1).toUpperCase() + colum[1].substring(1).toLowerCase() + "() {");
+    			pw.println("		return this." + colum[1] + ";");
+    			pw.println(" 	}");
+    			pw.println("");
     		}
 
     		//Class宣言(終了)

@@ -15,8 +15,19 @@ public class QueryInfo {
 	//ColumnNames
 	ArrayList<String> columnNames;
 
+	//ここは各メソッドで使い回すので、一回一回空にしてあげないといけない。
 	//ColumnValues
 	Map<String, String> columnValues = new HashMap<>();
+
+	//PrimaryKeyの値を取得
+	public String getIdValue() {
+		return columnValues.get(idName);
+	}
+
+	//columnValuesの初期化
+	public void clearQueryInfo() {
+		columnValues.clear();
+	}
 
 	public String getTableName() {
 		return tableName;

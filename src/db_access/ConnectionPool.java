@@ -9,7 +9,7 @@ import container.DBConfig;
 import container.EnvironmentConfigReader;
 import exception.DoNotHaveDBAccessException;
 import exception.NoDBAccessException;
-import exception.notBeginTransactionException;
+import exception.NotBeginTransactionException;
 
 public class ConnectionPool implements Serializable {
 
@@ -81,7 +81,7 @@ public class ConnectionPool implements Serializable {
 	/*
 	 * TransactionManager以外が使用する、コネクション取得メソッド
 	 */
-	public DBAccess getDBAccess(String transactionID) throws notBeginTransactionException {
+	public DBAccess getDBAccess(String transactionID) throws NotBeginTransactionException {
 		dba = null;
 		if(connectionPool.containsKey(transactionID)) {
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -90,11 +90,39 @@ public class ConnectionPool implements Serializable {
 		}else {
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 			System.out.println("トランザクションが開始されていない可能性があります");
-			throw new notBeginTransactionException();
+			throw new NotBeginTransactionException();
 		}
 		return dba;
 	}
 
+	//Transaction処理以外でDBAccess使いたい場合に使用するメソッド
+	public DBAccess getDBAccess() throws NoDBAccessException {
+		String connectionKey = null;
+		dba = null;
+		for (int i = 0; i < NUMBER_OF_DB_CONNECTIONS; i++) {
+			connectionKey = "unused" + i;
+
+			//使用されていないコネクションを取得する
+			if (connectionPool.containsKey(connectionKey)) {
+				dba = connectionPool.get(connectionKey);
+				break;
+			}
+		}
+		if (dba != null) {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("DBAccessを取得しました");
+		} else {
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			System.out.println("コネクションが全て使用中です。");
+			throw new NoDBAccessException();
+		}
+		return dba;
+	}
+	/**
+	 *
+	 * @param transactionID
+	 * @throws DoNotHaveDBAccessException
+	 */
 	//DBAccessを返してもらうメソッド
 	public void returnDBAccess(String transactionID) throws DoNotHaveDBAccessException {
 

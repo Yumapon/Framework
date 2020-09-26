@@ -1,6 +1,9 @@
 package usercreatesample.businessLogic;
 
 import annotation.Transactional;
+import dbMapper.Repository;
+import dbMapper.RepositoryImpl;
+import entityCreater.entity.User_id;
 import usercreatesample.beans.TestA;
 
 /**
@@ -11,6 +14,8 @@ import usercreatesample.beans.TestA;
 
 @Transactional
 public class BusinessLogicTestA implements BusinessLogic{
+
+	Repository<User_id, Integer> repos = new RepositoryImpl<>();
 
 	@Override
 	public void testMethod() {
@@ -33,6 +38,10 @@ public class BusinessLogicTestA implements BusinessLogic{
 	@Override
 	//@Transactional
 	public void login(String a, String b) {
+		User_id entity = new User_id();
+		entity.setId(1010110);
+		entity.setPassword("passwordddd");
+		repos.save(entity);
 		System.out.println("ビジネスロジックのメソッドが実行されました！！！！");
 	}
 

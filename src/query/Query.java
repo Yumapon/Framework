@@ -1,11 +1,14 @@
 package query;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import db_access.ConnectionPool;
-import exception.notBeginTransactionException;
+import exception.NoColumnValueException;
+import exception.NoDBAccessException;
+import exception.NotBeginTransactionException;
 
 public class Query {
 
@@ -23,75 +26,18 @@ public class Query {
 
 	//private Class<T> entityType;
 
-	public Query(/*@SuppressWarnings("unchecked") T... t*/) {
+	public Query() {
 		//TransactionIDを取得する
 		Thread currentThread = Thread.currentThread(); // 自分自身のスレッドを取得
 		long threadID = currentThread.getId();
 		this.transactionID = String.valueOf(threadID);
-
-		/*
-		@SuppressWarnings("unchecked")
-		Class<T> entityType = (Class<T>) t.getClass().getComponentType();
-		this.entityType = entityType;
-
-		//ログ発生箇所
-		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-		System.out.println(entityType);
-
-		//Entity情報を取得
-		//ログ発生箇所
-		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-		//処理内容
-		System.out.println("Entityクラス情報の取得を開始します");
-		try {
-			T entity = (T) this.entityType.getDeclaredConstructor().newInstance();
-
-			//Entityのテーブル名を取得
-			if (entity == null)
-				System.out.println("nullです");
-			else
-				if(entity.getClass().isAnnotationPresent(Table.class)) {
-					System.out.println("@Tableを発見 テーブル名を取得します");
-					this.tableName = entity.getClass().getAnnotation(Table.class).value();
-				}else {
-					System.out.println(entity.getClass().getName());
-					System.out.println("@Tableが付与されていません");
-				}
-
-			//EntityからPrimaryKeyのカラム名を取り出す
-			//ログ発生箇所
-			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-			//処理内容
-			System.out.println("Entityクラスのカラム名を取得します");
-			for (Field f : entity.getClass().getDeclaredFields()) {
-				//カラム名の取得
-				columnNames.add(f.getName());
-				//@idが付与されているメンバを探索
-				if (f.isAnnotationPresent(id.class)) {
-					try {
-						//ログ発生箇所
-						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-						//処理内容
-						System.out.println("EntityクラスのPrimaryKey名を取得します");
-						//Field名を取得する
-						this.idName = f.getName();
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-		}
-
-		//ログ発生箇所
-		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-		//処理内容
-		System.out.println("Entityクラス情報の取得が完了しました");
-		*/
 	}
 
+	/**
+	 * INSERT文生成メソッド
+	 * @param qi
+	 * @return
+	 */
 	public String createInsertSql(QueryInfo qi) {
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -123,6 +69,11 @@ public class Query {
 		return sql;
 	}
 
+	/**
+	 * UPDATE文生成メソッド
+	 * @param qi
+	 * @return
+	 */
 	public String createUpdateSql(QueryInfo qi) {
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -144,7 +95,8 @@ public class Query {
 		// 末尾から1文字分を削除
 		setValue = setValue.substring(0, setValue.length() - 1);
 
-		String sql = "UPDATE " + qi.getTableName() + " SET " + setValue + " WHERE " + qi.getIdName() + " = \"" + qi.getColumnValues().get(qi.getIdName()) + "\";";
+		String sql = "UPDATE " + qi.getTableName() + " SET " + setValue + " WHERE " + qi.getIdName() + " = \""
+				+ qi.getIdValue() + "\";";
 
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -154,21 +106,126 @@ public class Query {
 		return sql;
 	}
 
-	/*
-	public String createSelectSql() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	/**
+	 * SELECT文生成メソッド
+	 * @param qi
+	 * @return
+	 */
+	public String createSelectSql(QueryInfo qi) {
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println("SELECT文の生成を開始します");
+
+		//SQL生成
+		String idValue = qi.getIdValue();
+		boolean checkColumnValue = false;
+		String sql = "SELECT * FROM " + qi.getTableName();
+		if(idValue == null)
+			sql += " LIMIT 1000;";
+		else {
+			sql += " WHERE ";
+			for(String columnName : qi.getColumnNames()) {
+				if(qi.getColumnValues().get(columnName) == null || columnName.equals(qi.getIdName())) {
+					continue;
+				}
+				sql += columnName + " = \"" + qi.getColumnValues().get(columnName) + "\";";
+				checkColumnValue = true;
+			}
+			if(!checkColumnValue) {
+				//ログ発生箇所
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				//処理内容
+				System.out.println("カラムに何も値が入っていません");
+				sql += qi.getIdName() + " = \"" + qi.getIdValue() + "\";";
+			}
+		}
+		return sql;
 	}
 
-	public String createSelectSql() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	/**
+	 * RECORD確認用メソッド
+	 * @param qi
+	 * @return
+	 */
+	public String createCheckRecordSql(QueryInfo qi) {
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println("COUNTCHECK用SQLの生成を開始します");
+
+		//SQL生成
+		String sql = "SELECT COUNT(*) FROM " + qi.getTableName() + " WHERE " + qi.getIdName() + " = "
+				+ qi.getIdValue() + ";";
+
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println("COUNTCHECK用SQLの生成が完了しました:" + sql);
+
+		return sql;
 	}
-	*/
+
+	/**
+	 * DELETE文生成メソッド
+	 * @param qi
+	 * @return
+	 * @throws noColumnValueException
+	 */
+	public String createDeleteSql(QueryInfo qi) {
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println("DELETE文の生成を開始します");
+
+		String sql = null;
+
+		//SQL生成
+		String idValue = qi.getIdValue();
+		boolean checkColumnValue = false;
+		sql = "DELETE FROM " + qi.getTableName() + " WHERE ";
+		if(idValue != null)
+			sql += qi.getIdName() + " = \"" + idValue + "\";";
+		else {
+			for(String columnName : qi.getColumnNames()) {
+				if(qi.getColumnValues().get(columnName) == null || columnName.equals(qi.getIdName())) {
+					continue;
+				}
+				sql += columnName + " = \"" + qi.getColumnValues().get(columnName) + "\";";
+				checkColumnValue = true;
+			}
+			if(!checkColumnValue) {
+				//ログ発生箇所
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				//処理内容
+				System.out.println("カラムに何も値が入っていません");
+				throw new NoColumnValueException();
+			}
+		}
+
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println("DELETE文の生成が完了しました:" + sql);
+
+		return sql;
+	}
+
+	/**
+	 * レコード数をチェックするメソッド
+	 * @return
+	 */
+	public String createCheckCountSql(QueryInfo qi) {
+		return "SELECT COUNT(*) FROM " + qi.getTableName() + ";";
+	}
 
 	/*SQL実行メソッド*/
 
-	//更新メソッド
+	/**
+	 * 更新メソッド
+	 * @param sql
+	 * @return
+	 */
 	public int executeUpdate(String sql) {
 		//更新レコード数
 		int i = 0;
@@ -178,10 +235,10 @@ public class Query {
 			//ログ発生箇所
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 			//例外内容
-			System.out.println("コネクションを取得し、ステートメントを生成する");
+			System.out.println("コネクションを取得し、ステートメントを生成します");
 			stmt = cp.getDBAccess(transactionID).getConnection().createStatement();
 			i = stmt.executeUpdate(sql);
-		} catch (notBeginTransactionException e) {
+		} catch (NotBeginTransactionException e) {
 			//ログ発生箇所
 			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 			//例外内容
@@ -203,10 +260,41 @@ public class Query {
 		return i;
 	}
 
-	/*
-	public ArrayList<T> selectExecute(String sql) {
-		return null;
+	/**
+	 * 参照メソッド
+	 * @param sql
+	 * @return
+	 */
+	public ResultSet executeQuery(String sql) {
+		//Connectionの取得
+		ResultSet rs = null;
+		try {
+			//ログ発生箇所
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			//処理内容
+			System.out.println("コネクションを取得し、ステートメントを生成します");
+			stmt = cp.getDBAccess().getConnection().createStatement();
+			rs = stmt.executeQuery(sql);
+		} catch (SQLException e) {
+			//ログ発生箇所
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			//例外内容
+			System.out.println("SQLエラーが発生しました");
+			e.printStackTrace();
+		} catch (NoDBAccessException e) {
+			//ログ発生箇所
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			//例外内容
+			System.out.println("Connectionが見つかりません");
+			e.printStackTrace();
+		}
+
+		//ログ発生箇所
+		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+		//処理内容
+		System.out.println("SQLを実行しました");
+
+		return rs;
 	}
-	*/
 
 }

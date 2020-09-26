@@ -32,7 +32,7 @@ public class ActionTestA {
 		System.out.println(testA.getStr1());
 		System.out.println(testA.getStr2());
 		System.out.println("アクションクラスのメソッドが実行されました！！！！！");
-		bl1.testMethod();
+		bl1.login("hoge", "hoge");
 
 		return "index2.html : forword";
 	}

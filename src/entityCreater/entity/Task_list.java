@@ -29,20 +29,40 @@ public class Task_list {
 		this.num = num;
  	}
 
+	public String getNum() {
+		return this.num;
+ 	}
+
 	public void setDeadline(java.sql.Date deadline) {
 		this.deadline = deadline;
+ 	}
+
+	public java.sql.Date getDeadline() {
+		return this.deadline;
  	}
 
 	public void setName(String name) {
 		this.name = name;
  	}
 
+	public String getName() {
+		return this.name;
+ 	}
+
 	public void setContent(String content) {
 		this.content = content;
  	}
 
+	public String getContent() {
+		return this.content;
+ 	}
+
 	public void setClient(String client) {
 		this.client = client;
+ 	}
+
+	public String getClient() {
+		return this.client;
  	}
 
 }

@@ -11,17 +11,25 @@ public class User_id {
 
 	@id
 	@column
-	private int id;
+	private Integer id;
 
 	@column
 	private String password;
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
+ 	}
+
+	public Integer getId() {
+		return this.id;
  	}
 
 	public void setPassword(String password) {
 		this.password = password;
+ 	}
+
+	public String getPassword() {
+		return this.password;
  	}
 
 }

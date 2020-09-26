@@ -8,7 +8,7 @@ import db_access.DBAccess;
 import exception.AlreadyTransactionBeganException;
 import exception.DoNotHaveDBAccessException;
 import exception.NoDBAccessException;
-import exception.notBeginTransactionException;
+import exception.NotBeginTransactionException;
 
 public class DefaultTransactionManager implements TransactionManager {
 
@@ -76,7 +76,7 @@ public class DefaultTransactionManager implements TransactionManager {
 				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 				System.out.println("DBへ結果をCOMMITします");
 				cp.getDBAccess(transactionID).getConnection().commit();
-			} catch (notBeginTransactionException | SQLException e) {
+			} catch (NotBeginTransactionException | SQLException e) {
 				e.printStackTrace();
 			}
 		}
@@ -84,6 +84,7 @@ public class DefaultTransactionManager implements TransactionManager {
 		transactionStatus = false;
 		//コネクションの返却
 		this.returnConnection(transactionID);
+
 	}
 
 	@Override

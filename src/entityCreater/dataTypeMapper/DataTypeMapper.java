@@ -32,7 +32,7 @@ public class DataTypeMapper {
 			break;
 		case "INTEGER":
 		case "INT":
-			javaDataType = "int";
+			javaDataType = "Integer";
 			break;
 		case "BIGINT":
 			javaDataType = "long";

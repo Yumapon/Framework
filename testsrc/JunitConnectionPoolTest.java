@@ -4,7 +4,7 @@ import org.junit.Test;
 import db_access.ConnectionPool;
 import db_access.DBAccess;
 import exception.AlreadyTransactionBeganException;
-import exception.notBeginTransactionException;
+import exception.NotBeginTransactionException;
 import transactionManager.DefaultTransactionManager;
 import transactionManager.TransactionManager;
 
@@ -21,7 +21,7 @@ public class JunitConnectionPoolTest {
 	}
 
 	@Test
-	public void test() throws notBeginTransactionException, AlreadyTransactionBeganException {
+	public void test() throws NotBeginTransactionException, AlreadyTransactionBeganException {
 		//インスタンスが取得できるか確認
 		ConnectionPool cp = ConnectionPool.getInstance();
 		TransactionManager tm = new DefaultTransactionManager();

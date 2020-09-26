@@ -1,5 +1,5 @@
 package exception;
 
-public class notBeginTransactionException extends Exception {
+public class NotBeginTransactionException extends Exception{
 
 }

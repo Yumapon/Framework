@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public class JunitQueryTest {
 		columnNames.add("password");
 
 		Map<String, String> value = new HashMap<>();
-		value.put("id", "1234");
+		//value.put("id", "1234");
 		value.put("password", "hogehoge");
 
 		qi.setTableName("User_id");
@@ -52,16 +53,31 @@ public class JunitQueryTest {
 		q.executeUpdate(sql);
 	}
 
-	//@Ignore
+	@Ignore
 	@Test
 	public void test2() {
-		String sql = q.createInsertSql(qi);
-		System.out.println(sql);
+		sql = q.createInsertSql(qi);
+	}
+
+	@Ignore
+	@Test
+	public void test3() {
+		sql = q.createUpdateSql(qi);
+	}
+
+	@Ignore
+	@Test
+	public void test4() {
+		sql = q.createCheckRecordSql(qi);
 	}
 
 	@Test
-	public void test3() {
-		String sql = q.createUpdateSql(qi);
+	public void test5() {
+		sql = q.createDeleteSql(qi);
+	}
+
+	@After
+	public void tearDown() {
 		System.out.println(sql);
 	}
 
