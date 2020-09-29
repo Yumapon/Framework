@@ -90,7 +90,7 @@ public class EntityGeneratorImplements implements EntityGenerator{
     		Iterator<String[]> it = columns.iterator();
 
     		while(it.hasNext()) {
-    			String[] colum = (String[])it.next();
+    			String[] colum = it.next();
 
     			//Columnの宣言
     			if(colum[1].equals(id)) {
@@ -107,7 +107,7 @@ public class EntityGeneratorImplements implements EntityGenerator{
     		it = columns.iterator();
 
     		while(it.hasNext()) {
-    			String[] colum = (String[])it.next();
+    			String[] colum = it.next();
 
     			//Setter宣言
     			pw.println("	public void set" + colum[1].substring(0, 1).toUpperCase() + colum[1].substring(1).toLowerCase() + "(" + colum[0] + " " + colum[1] + ") {");

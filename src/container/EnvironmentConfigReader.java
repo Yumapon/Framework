@@ -8,6 +8,7 @@ public class EnvironmentConfigReader implements Reader<DBConfig>{
 	static String configFileName = "DBProfile.yaml";
 
 	//yamlファイルからDB設定を取得するメソッド(引数なし)
+	@Override
 	public DBConfig read() {
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -26,6 +27,7 @@ public class EnvironmentConfigReader implements Reader<DBConfig>{
 	}
 
 	//yamlファイルからDB設定を取得するメソッド(引数あり)
+	@Override
 	public DBConfig read(String setConfigFileName) {
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");

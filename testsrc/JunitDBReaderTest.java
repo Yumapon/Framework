@@ -10,7 +10,6 @@ public class JunitDBReaderTest {
 	@Test
 	public void test() {
 		DBReaderImplements dbr = new DBReaderImplements();
-		@SuppressWarnings("static-access")
 		ArrayList<EntityInfo> list = dbr.read();
 
 		System.out.println(list.size());

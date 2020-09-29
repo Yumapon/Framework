@@ -31,7 +31,7 @@ public class HogeHogeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	//コンテナ生成
-	ApplicationContainer ac = (ApplicationContainer) new ApplicationContainerImplemention();
+	ApplicationContainer ac = new ApplicationContainerImplemention();
 
 	//Action格納用Object
 	Object actionObj;
@@ -49,6 +49,7 @@ public class HogeHogeServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		//バインディングするBean名(Form名)を取得 formはからでもOK
@@ -187,6 +188,7 @@ public class HogeHogeServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 

@@ -14,6 +14,7 @@ import entityCreater.info.EntityInfo;
 
 public class DBReaderImplements implements DBReader{
 
+	@Override
 	public ArrayList<EntityInfo> read() {
 
 		//metadata格納用

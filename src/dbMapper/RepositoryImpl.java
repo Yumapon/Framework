@@ -56,7 +56,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 		//処理内容
 		System.out.println("Entityクラス情報の取得を開始します");
 		try {
-			T entity = (T) this.entityType.getDeclaredConstructor().newInstance();
+			T entity = this.entityType.getDeclaredConstructor().newInstance();
 
 			//Entityのテーブル名を取得
 			if (entity == null)
@@ -246,7 +246,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 		//処理内容
 		System.out.println("結果からEntity情報を取得します");
 		try {
-			entity = (T) this.entityType.getDeclaredConstructor().newInstance();
+			entity = this.entityType.getDeclaredConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e1) {
 			e1.printStackTrace();
@@ -305,7 +305,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 		Field f;
 		try {
 			while (result.next()) {
-				entity = (T) this.entityType.getDeclaredConstructor().newInstance();
+				entity = this.entityType.getDeclaredConstructor().newInstance();
 				for (String column : columnNames) {
 					Object columnValue = result.getObject(column);
 					f = entity.getClass().getDeclaredField(column);
@@ -360,7 +360,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 		Field f;
 		try {
 			while (result.next()) {
-				entity = (T) this.entityType.getDeclaredConstructor().newInstance();
+				entity = this.entityType.getDeclaredConstructor().newInstance();
 				for (String column : columnNames) {
 					Object columnValue = result.getObject(column);
 					f = entity.getClass().getDeclaredField(column);
