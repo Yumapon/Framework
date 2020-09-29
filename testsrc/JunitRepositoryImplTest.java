@@ -2,34 +2,38 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import dbMapper.RepositoryImpl;
 import entityCreater.entity.Task_list;
+import entityCreater.entity.Test2;
 import entityCreater.entity.User_id;
 import exception.NoColumnValueException;
 import transactionManager.DefaultTransactionManager;
 import transactionManager.TransactionManager;
 
+@FixMethodOrder (MethodSorters.NAME_ASCENDING)
 public class JunitRepositoryImplTest {
 
 	RepositoryImpl<User_id, Integer> repos;
 	RepositoryImpl<Task_list, String> repos2;
 	RepositoryImpl<entityCreater.entity.Test, String> repos3;
+	RepositoryImpl<Test2, Integer> repos4;
 	TransactionManager tm = new DefaultTransactionManager();
 
 	@Before
 	public void setUp() {
-		System.out.println("-------テスト結果-------");
 		repos = new RepositoryImpl<>();
 		repos2 = new RepositoryImpl<>();
 		repos3 = new RepositoryImpl<>();
+		repos4 = new RepositoryImpl<>();
 	}
 
-	@Ignore
 	@Test
-	public void test() {
+	public void test01() {
+		System.out.println("-------テスト結果1-------");
 		User_id entity = new User_id();
 		entity.setId(1010110);
 		entity.setPassword("passwordddd");
@@ -67,19 +71,20 @@ public class JunitRepositoryImplTest {
 
 	}
 
-	@Ignore
+
 	@Test
-	public void test2() {
+	public void test02() {
+		System.out.println("-------テスト結果2-------");
 		if (repos.existsById(888888))
 			System.out.println("あります");
 		else
 			System.out.println("ないです");
 	}
 
-	@Ignore
-	@Test(expected = NoColumnValueException.class)
-	public void test3() {
 
+	@Test(expected = NoColumnValueException.class)
+	public void test03() {
+		System.out.println("-------テスト結果3-------");
 		//主キー削除
 		User_id entity = new User_id();
 		entity.setId(100);
@@ -107,16 +112,16 @@ public class JunitRepositoryImplTest {
 		tm.endTransaction();
 	}
 
-	@Ignore
 	@Test
-	public void test4() {
+	public void test04() {
+		System.out.println("-------テスト結果4-------");
 		int i = repos.count();
 		System.out.println(i);
 	}
 
-	@Ignore
 	@Test
-	public void test5() {
+	public void test05() {
+		System.out.println("-------テスト結果5-------");
 		Optional<User_id> entity = repos.findById(121212);
 		if (entity.isPresent()) {
 			User_id entityty = entity.get();
@@ -134,9 +139,9 @@ public class JunitRepositoryImplTest {
 			System.out.println("ないです。。");
 	}
 
-	@Ignore
 	@Test
-	public void test6() {
+	public void test06() {
+		System.out.println("-------テスト結果6-------");
 		ArrayList<User_id> list = repos.findAll();
 		for (User_id e : list) {
 			System.out.println(e.getId());
@@ -153,9 +158,9 @@ public class JunitRepositoryImplTest {
 		}
 	}
 
-	@Ignore
 	@Test
-	public void test7() {
+	public void test07() {
+		System.out.println("-------テスト結果7-------");
 		User_id entity = new User_id();
 		entity.setPassword("hogehoge");
 
@@ -166,9 +171,10 @@ public class JunitRepositoryImplTest {
 		}
 	}
 
-	@Ignore
+
 	@Test
-	public void test8() {
+	public void test08() {
+		System.out.println("-------テスト結果8-------");
 		Optional<Task_list> entityOpt;
 		entityOpt = repos2.multiFindById("swswswwswswwsws");
 
@@ -189,9 +195,10 @@ public class JunitRepositoryImplTest {
 		}
 	}
 
-	@Ignore
+	//@Ignore
 	@Test
-	public void test9() {
+	public void test09() {
+		System.out.println("-------テスト結果9-------");
 		entityCreater.entity.Test test = new entityCreater.entity.Test();
 		test.setNamename("popopo");
 		test.setNum("swswswwswswwsws");
@@ -203,6 +210,21 @@ public class JunitRepositoryImplTest {
 
 	@Test
 	public void test10() {
+		System.out.println("-------テスト結果10-------");
+		//Test2の格納
+		Test2 test2 = new Test2();
+		test2.setId(121212);
+		test2.setNum("swswswwswswwsws");
+		test2.setNamename("powpow");
+
+		tm.beginTransaction();
+		repos4.save(test2);
+		tm.endTransaction();
+	}
+
+	@Test
+	public void test11() {
+		System.out.println("-------テスト結果11-------");
 		Optional<entityCreater.entity.Test> entityOpt;
 		entityOpt = repos3.multiFindById("swswswwswswwsws");
 
@@ -212,13 +234,18 @@ public class JunitRepositoryImplTest {
 			System.out.println("--------TestEntityの内容--------");
 			System.out.println(e.getNum());
 			System.out.println(e.getNamename());
-			System.out.println("--------Task_listEntityの内容--------");
+			System.out.println("--------(子)Task_listEntityの内容--------");
 			System.out.println(e.getTask_list().getNum());
 			System.out.println(e.getTask_list().getContent());
 			System.out.println(e.getTask_list().getName());
 			System.out.println(e.getTask_list().getClient());
 			System.out.println(e.getTask_list().getDeadline());
-			System.out.println("--------Task_list2Entityの内容--------");
+			System.out.println("--------(子)Test2Entityの内容--------");
+			for(Test2 t : e.getTest2()) {
+				System.out.println(t.getId());
+				System.out.println(t.getNum());
+				System.out.println(t.getNamename());
+			}
 
 		} else {
 			System.out.println("何も取れず");

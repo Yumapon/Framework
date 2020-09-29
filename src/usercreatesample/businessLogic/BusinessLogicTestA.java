@@ -17,6 +17,13 @@ public class BusinessLogicTestA implements BusinessLogic{
 
 	Repository<User_id, Integer> repos = new RepositoryImpl<>();
 
+	/**
+	 * コンストラクタ
+	 */
+	public BusinessLogicTestA() {
+
+	}
+
 	@Override
 	public void testMethod() {
 		System.out.println("ビジネスロジックのメソッドが実行されました！！！！");
@@ -29,7 +36,7 @@ public class BusinessLogicTestA implements BusinessLogic{
 	}
 
 	@Override
-	//@Transactional
+	@Transactional
 	public boolean login(String pass) {
 		System.out.println("ビジネスロジックのメソッドが実行されました！！！！");
 		return false;

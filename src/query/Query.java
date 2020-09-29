@@ -50,23 +50,33 @@ public class Query {
 		System.out.println("Entityの情報を取得します");
 
 		//SQL生成
-		String column = "";
-		String columnValue = "";
+		StringBuilder column = new StringBuilder();
+		StringBuilder columnValue = new StringBuilder();
 		for (String str : qi.getColumnNames()) {
-			column += (str + " ,");
-			columnValue += ("\"" + qi.getColumnValues().get(str) + "\",");
+			column.append(str);
+			column.append(" ,");
+			columnValue.append("\"");
+			columnValue.append(qi.getColumnValues().get(str));
+			columnValue.append("\",");
 		}
 		// 末尾から1文字分を削除
-		column = column.substring(0, column.length() - 1);
-		columnValue = columnValue.substring(0, columnValue.length() - 1);
+		column.deleteCharAt(column.length() - 1);
+		columnValue.deleteCharAt(columnValue.length() - 1);
 
-		String sql = "INSERT INTO " + qi.getTableName() + " (" + column + ") values (" + columnValue + ");";
+		StringBuilder sql = new StringBuilder();
+		sql.append("INSERT INTO ");
+		sql.append(qi.getTableName());
+		sql.append(" (");
+		sql.append(column);
+		sql.append(") values (");
+		sql.append(columnValue);
+		sql.append(");");
 
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//処理内容
 		System.out.println("INSERT文の生成が完了しました:" + sql);
-		return sql;
+		return sql.toString();
 	}
 
 	/**
@@ -86,24 +96,28 @@ public class Query {
 		System.out.println("Entityの情報を取得します");
 
 		//SQL生成
-		String setValue = "";
+		StringBuilder setValue = new StringBuilder();
 		for (String column : qi.getColumnNames()) {
 			if (column.equals(qi.getIdName()))
 				continue;
-			setValue += (column + " = \"" + qi.getColumnValues().get(column) + "\",");
+			setValue.append(column);
+			setValue.append(" = \"");
+			setValue.append(qi.getColumnValues().get(column));
+			setValue.append("\",");
 		}
 		// 末尾から1文字分を削除
-		setValue = setValue.substring(0, setValue.length() - 1);
+		setValue.deleteCharAt(setValue.length() - 1);
 
-		String sql = "UPDATE " + qi.getTableName() + " SET " + setValue + " WHERE " + qi.getIdName() + " = \""
-				+ qi.getIdValue() + "\";";
+		StringBuilder sql = new StringBuilder();
+		sql.append("UPDATE ").append(qi.getTableName()).append(" SET ").append(setValue).append(" WHERE ")
+				.append(qi.getIdName()).append(" = \"").append(qi.getIdValue()).append("\";");
 
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//処理内容
 		System.out.println("UPDATE文の生成が完了しました:" + sql);
 
-		return sql;
+		return sql.toString();
 	}
 
 	/**
@@ -119,26 +133,28 @@ public class Query {
 
 		//SQL生成
 		String idValue = qi.getIdValue();
-		String sql = "SELECT * FROM " + qi.getTableName();
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * FROM ").append(qi.getTableName());
 		//QueryInfoに何もセットされていない場合、全件検索
 		if (idValue == null && qi.getColumnValues().size() == 0)
-			sql += " LIMIT 1000;";
+			sql.append(" LIMIT 1000;");
 		//QueryInfoにidValue以外のカラム値が設定されている場合、条件検索
 		else {
-			sql += " WHERE ";
+			sql.append(" WHERE ");
 			if (idValue != null) {
-				sql += qi.getIdName() + " = \"" + idValue + "\";";
+				sql.append(qi.getIdName()).append(" = \"").append(idValue).append("\";");
 			} else {
 				for (String columnName : qi.getColumnNames()) {
 					if (qi.getColumnValues().get(columnName) == null || columnName.equals(qi.getIdName())) {
 						continue;
 					}
-					sql += columnName + " = \"" + qi.getColumnValues().get(columnName) + "\" AND ";
+					sql.append(columnName).append(" = \"").append(qi.getColumnValues().get(columnName))
+							.append("\" AND ");
 				}
-				sql = sql.substring(0, sql.length() - 5) + ";";
+				sql.delete(sql.length() - 4, sql.length() - 1).append(";");
 			}
 		}
-		return sql;
+		return sql.toString();
 	}
 
 	/**
@@ -153,15 +169,17 @@ public class Query {
 		System.out.println("COUNTCHECK用SQLの生成を開始します");
 
 		//SQL生成
-		String sql = "SELECT COUNT(*) FROM " + qi.getTableName() + " WHERE " + qi.getIdName() + " = \""
-				+ qi.getIdValue() + "\";";
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT COUNT(*) FROM ").append(qi.getTableName()).append(" WHERE ").append(qi.getIdName())
+				.append(" = \"")
+				.append(qi.getIdValue()).append("\";");
 
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//処理内容
 		System.out.println("COUNTCHECK用SQLの生成が完了しました:" + sql);
 
-		return sql;
+		return sql.toString();
 	}
 
 	/**
@@ -176,20 +194,20 @@ public class Query {
 		//処理内容
 		System.out.println("DELETE文の生成を開始します");
 
-		String sql = null;
+		StringBuilder sql = new StringBuilder();
 
 		//SQL生成
 		String idValue = qi.getIdValue();
 		boolean checkColumnValue = false;
-		sql = "DELETE FROM " + qi.getTableName() + " WHERE ";
+		sql.append("DELETE FROM ").append(qi.getTableName()).append(" WHERE ");
 		if (idValue != null)
-			sql += qi.getIdName() + " = \"" + idValue + "\";";
+			sql.append(qi.getIdName()).append(" = \"").append(idValue).append("\";");
 		else {
 			for (String columnName : qi.getColumnNames()) {
 				if (qi.getColumnValues().get(columnName) == null || columnName.equals(qi.getIdName())) {
 					continue;
 				}
-				sql += columnName + " = \"" + qi.getColumnValues().get(columnName) + "\";";
+				sql.append(columnName).append(" = \"").append(qi.getColumnValues().get(columnName)).append("\";");
 				checkColumnValue = true;
 			}
 			if (!checkColumnValue) {
@@ -206,7 +224,7 @@ public class Query {
 		//処理内容
 		System.out.println("DELETE文の生成が完了しました:" + sql);
 
-		return sql;
+		return sql.toString();
 	}
 
 	/**

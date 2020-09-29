@@ -4,5 +4,5 @@ driver: com.mysql.cj.jdbc.Driver #driver名
 url: jdbc:mysql://localhost:3306/TaskDB #DBのURL
 user: yuma #DBのユーザ
 password: password #DBのパスワード
-numberOfAccess: 3 #コネクションの数
+numberOfAccess: 10 #コネクションの数
 dbName: taskdb #DB名

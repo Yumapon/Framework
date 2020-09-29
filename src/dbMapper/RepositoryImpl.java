@@ -132,6 +132,9 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 			//entityのカラム値を取得
 			for (Field f : entity.getClass().getDeclaredFields()) {
 				try {
+					if(!f.isAnnotationPresent(column.class)) {
+						continue;
+					}
 					f.setAccessible(true);
 					qi.getColumnValues().put(f.getName(), f.get(entity).toString());
 					f.setAccessible(false);

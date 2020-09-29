@@ -1,5 +1,7 @@
 package entityCreater.entity;
 
+import java.util.List;
+
 import annotation.Entity;
 import annotation.OneToMany;
 import annotation.OneToOne;
@@ -22,13 +24,13 @@ public class Test {
 	private Task_list task_list;
 
 	@OneToMany(mappingBy = {"num"})
-	private Test2 test2;
+	private List<Test2> test2;
 
-	public Test2 getTest2() {
+	public List<Test2> getTest2() {
 		return test2;
 	}
 
-	public void setTest2(Test2 test2) {
+	public void setTest2(List<Test2> test2) {
 		this.test2 = test2;
 	}
 
