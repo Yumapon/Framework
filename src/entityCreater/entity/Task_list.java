@@ -1,6 +1,8 @@
 package entityCreater.entity;
 
 import annotation.Entity;
+import annotation.OneToMany;
+import annotation.OneToOne;
 import annotation.Table;
 import annotation.column;
 import annotation.id;
@@ -24,6 +26,28 @@ public class Task_list {
 
 	@column
 	private String client;
+
+	@OneToOne
+	private entityCreater.entity.Test test;
+
+	@OneToMany(mappingBy = {"num"})
+	private Test2 test2;
+
+	public Test2 getTest2() {
+		return test2;
+	}
+
+	public void setTest2(Test2 test2) {
+		this.test2 = test2;
+	}
+
+	public entityCreater.entity.Test getTest() {
+		return test;
+	}
+
+	public void setTest(entityCreater.entity.Test test) {
+		this.test = test;
+	}
 
 	public void setNum(String num) {
 		this.num = num;

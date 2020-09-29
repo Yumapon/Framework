@@ -119,25 +119,23 @@ public class Query {
 
 		//SQL生成
 		String idValue = qi.getIdValue();
-		boolean checkColumnValue = false;
 		String sql = "SELECT * FROM " + qi.getTableName();
-		if(idValue == null)
+		//QueryInfoに何もセットされていない場合、全件検索
+		if (idValue == null && qi.getColumnValues().size() == 0)
 			sql += " LIMIT 1000;";
+		//QueryInfoにidValue以外のカラム値が設定されている場合、条件検索
 		else {
 			sql += " WHERE ";
-			for(String columnName : qi.getColumnNames()) {
-				if(qi.getColumnValues().get(columnName) == null || columnName.equals(qi.getIdName())) {
-					continue;
+			if (idValue != null) {
+				sql += qi.getIdName() + " = \"" + idValue + "\";";
+			} else {
+				for (String columnName : qi.getColumnNames()) {
+					if (qi.getColumnValues().get(columnName) == null || columnName.equals(qi.getIdName())) {
+						continue;
+					}
+					sql += columnName + " = \"" + qi.getColumnValues().get(columnName) + "\" AND ";
 				}
-				sql += columnName + " = \"" + qi.getColumnValues().get(columnName) + "\";";
-				checkColumnValue = true;
-			}
-			if(!checkColumnValue) {
-				//ログ発生箇所
-				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-				//処理内容
-				System.out.println("カラムに何も値が入っていません");
-				sql += qi.getIdName() + " = \"" + qi.getIdValue() + "\";";
+				sql = sql.substring(0, sql.length() - 5) + ";";
 			}
 		}
 		return sql;
@@ -155,8 +153,8 @@ public class Query {
 		System.out.println("COUNTCHECK用SQLの生成を開始します");
 
 		//SQL生成
-		String sql = "SELECT COUNT(*) FROM " + qi.getTableName() + " WHERE " + qi.getIdName() + " = "
-				+ qi.getIdValue() + ";";
+		String sql = "SELECT COUNT(*) FROM " + qi.getTableName() + " WHERE " + qi.getIdName() + " = \""
+				+ qi.getIdValue() + "\";";
 
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -184,17 +182,17 @@ public class Query {
 		String idValue = qi.getIdValue();
 		boolean checkColumnValue = false;
 		sql = "DELETE FROM " + qi.getTableName() + " WHERE ";
-		if(idValue != null)
+		if (idValue != null)
 			sql += qi.getIdName() + " = \"" + idValue + "\";";
 		else {
-			for(String columnName : qi.getColumnNames()) {
-				if(qi.getColumnValues().get(columnName) == null || columnName.equals(qi.getIdName())) {
+			for (String columnName : qi.getColumnNames()) {
+				if (qi.getColumnValues().get(columnName) == null || columnName.equals(qi.getIdName())) {
 					continue;
 				}
 				sql += columnName + " = \"" + qi.getColumnValues().get(columnName) + "\";";
 				checkColumnValue = true;
 			}
-			if(!checkColumnValue) {
+			if (!checkColumnValue) {
 				//ログ発生箇所
 				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 				//処理内容

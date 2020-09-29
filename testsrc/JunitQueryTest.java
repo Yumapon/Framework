@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import entityCreater.entity.Task_list;
 import entityCreater.entity.User_id;
 import query.Query;
 import query.QueryInfo;
@@ -15,12 +16,15 @@ public class JunitQueryTest {
 
 	//User_id entity = new User_id();
 	Query q;
+	Query q2;//Task_list用
 
 	String sql;
 
 	User_id entity;
+	Task_list entity2;
 
 	QueryInfo qi;
+	QueryInfo qi2;
 
 	@Before
 	public void setUp() {
@@ -44,6 +48,31 @@ public class JunitQueryTest {
 		qi.setIdName("id");
 		qi.setColumnNames(columnNames);
 		qi.setColumnValues(value);
+
+		//クエリクラスの生成
+		q2 = new Query();
+		entity2 = new Task_list();
+		entity2.setNum("hogehoge");
+		entity2.setClient("poyopoyo");
+
+		qi2 = new QueryInfo();
+		ArrayList<String> columnNames2 = new ArrayList<>();
+		columnNames2.add("num");
+		columnNames2.add("client");
+		columnNames2.add("deadline");
+		columnNames2.add("name");
+		columnNames2.add("content");
+
+		Map<String, String> value2 = new HashMap<>();
+		//value.put("id", "1234");
+		value2.put("name", "hogehoge");
+		value2.put("client", "hogehoge");
+		value2.put("content", "hogehoge");
+
+		qi2.setTableName("Task_list");
+		qi2.setIdName("num");
+		qi2.setColumnNames(columnNames2);
+		qi2.setColumnValues(value2);
 	}
 
 	@Ignore
@@ -71,9 +100,20 @@ public class JunitQueryTest {
 		sql = q.createCheckRecordSql(qi);
 	}
 
+	@Ignore
 	@Test
 	public void test5() {
 		sql = q.createDeleteSql(qi);
+	}
+
+	@Test
+	public void test6() {
+		sql = q.createSelectSql(qi);
+	}
+
+	@Test
+	public void test7() {
+		sql = q2.createSelectSql(qi2);
 	}
 
 	@After
