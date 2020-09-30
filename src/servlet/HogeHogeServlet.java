@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import annotation.ActionMethod;
+import annotation.RequestScoped;
 import annotation.SessionScoped;
 import container.ApplicationContainer;
 import container.ApplicationContainerImplemention;
@@ -115,6 +116,7 @@ public class HogeHogeServlet extends HttpServlet {
 						String urlAndMethodStr = (String) m2.invoke(actionObj);
 						String[] urlAndMethod = urlAndMethodStr.split(" : ", 0);
 
+						/*
 						//ログ発生箇所
 						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 						//処理内容
@@ -135,6 +137,7 @@ public class HogeHogeServlet extends HttpServlet {
 								Object obj = actionObj;
 								session.setAttribute(f.getName(), obj);
 							}
+							*/
 
 							/*
 							//Cookieの格納
@@ -154,7 +157,6 @@ public class HogeHogeServlet extends HttpServlet {
 								}
 							}
 							*/
-						}
 
 						invokeMethodCheck = true;
 
@@ -227,6 +229,59 @@ public class HogeHogeServlet extends HttpServlet {
 			formField.setAccessible(true);
 			form = formField.get(actionObj);
 			formField.setAccessible(false);
+
+			//ログ発生箇所
+			System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+			//処理内容
+			System.out.println("InstanceScopeを確認しています");
+
+			//Sessionへの格納
+			if(form.getClass().isAnnotationPresent(SessionScoped.class)) {
+				//ログ発生箇所
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				//例外内容
+				System.out.println("Entityに@SessionScopedが付与されているのを確認しました");
+				//ログ発生箇所
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				//例外内容
+				System.out.println("Sessionにインスタンスを格納します。" + "インスタンス名：" + form.getClass().getName());
+				HttpSession session = request.getSession(true);
+				Object obj = form;
+				session.setAttribute(form.getClass().getName(), obj);
+			}
+
+			//Requestへの格納
+			if(form.getClass().isAnnotationPresent(RequestScoped.class)) {
+				//ログ発生箇所
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				//例外内容
+				System.out.println("Entityに@RequestScopedが付与されているのを確認しました");
+				//ログ発生箇所
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				//例外内容
+				System.out.println("Requestにインスタンスを格納します。" + "インスタンス名：" + form.getClass().getName());
+				Object obj = form;
+				request.setAttribute(form.getClass().getName(), obj);
+			}
+
+			/*
+			//Cookieの格納
+			for(Field f1 : field.getClass().getDeclaredFields()) {
+				//ログ発生箇所
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				//例外内容
+				System.out.println("Cookieにインスタンスを格納します。" + "フィールド名：" + f1.getName());
+				if(f1.isAnnotationPresent(CookieScoped.class)) {
+
+					f.setAccessible(true);
+					Object obj = f1.get(field);
+					f.setAccessible(false);
+
+					Cookie cookie = new Cookie(f1.getName(), obj.toString());
+					response.addCookie(cookie);
+				}
+			}
+			*/
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
