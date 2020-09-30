@@ -114,27 +114,22 @@ public class HogeHogeServlet extends HttpServlet {
 						System.out.print("実行するメソッドが見つかりました。実行します 実行するメソッド：");
 						System.out.println(m2.getName());
 
-						//遷移先URLとメソッド（forword or redirect）を取得
-						String urlAndMethodStr = (String) m2.invoke(actionObj);
-						String[] urlAndMethod = urlAndMethodStr.split(" : ", 0);
+						//遷移先URLとメソッド（forword or redirect）などを取得
+						Model model = (Model) m2.invoke(actionObj);
 
-						/*
-						for(Field f : clazz.getDeclaredFields()) {
-							f.setAccessible(true);
-							Object field = f.get(actionObj);
-							f.setAccessible(false);
+						//WEBの場合
+						if(model.getType().equals("web")) {
+							invokeMethodCheck = true;
+
+							if(model.getMethod().equals("forword")) {
+								request.getRequestDispatcher(model.getNextPage()).forward(request, response);
+							}else if(model.getMethod().equals("redirect")) {
+								response.sendRedirect(model.getNextPage());
+							}else {
+								throw new IlligalMethodNameException();
+							}
 						}
-						*/
 
-						invokeMethodCheck = true;
-
-						if(urlAndMethod[1].equals("forword")) {
-							request.getRequestDispatcher(urlAndMethod[0]).forward(request, response);
-						}else if(urlAndMethod[1].equals("redirect")) {
-							response.sendRedirect(urlAndMethod[0]);
-						}else {
-							throw new IlligalMethodNameException();
-						}
 
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
 
