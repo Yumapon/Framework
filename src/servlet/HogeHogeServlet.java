@@ -207,9 +207,26 @@ public class HogeHogeServlet extends HttpServlet {
 				//ログ発生箇所
 				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 				//例外内容
-				System.out.println("Sessionにインスタンスを格納します。" + "インスタンス名：" + form.getClass().getName());
+				System.out.println("Sessionにインスタンスがすでに格納されているか確認します。" + "インスタンス名：" + form.getClass().getName());
+
+				//すでにSessionに入っている場合
 				HttpSession session = request.getSession(true);
-				Object obj = form;
+				Object obj = session.getAttribute(form.getClass().getName());
+				if(obj != null) {
+					//ログ発生箇所
+					System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+					//例外内容
+					System.out.println("Sessionからインスタンスを取得します。" + "インスタンス名：" + form.getClass().getName());
+					formField.setAccessible(true);
+					formField.set(actionObj, obj);
+					formField.setAccessible(false);
+					return;
+				}
+				//ログ発生箇所
+				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+				//例外内容
+				System.out.println("Sessionにインスタンスを格納します。" + "インスタンス名：" + form.getClass().getName());
+				obj = form;
 				session.setAttribute(form.getClass().getName(), obj);
 			}
 
@@ -275,31 +292,48 @@ public class HogeHogeServlet extends HttpServlet {
 				//Fieldの方を取得
 				Class<?> type = f.getType();
 				String typeName = type.toString();
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★★★★★");
+				System.out.println(typeName);
+				System.out.println(paraName);
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★★★★★");
 
-				if (typeName.contains("String")) {
+				if (typeName.contains("[Ljava.lang.String")) {
+					f.set(form, request.getParameterValues(paraName));
+				}else if(typeName.contains("String")) {
 					f.set(form, request.getParameter(paraName));
-				} else if (typeName.contains("int")) {
+					break;
+				}else if (typeName.contains("int")) {
 					f.set(form, Integer.parseInt(request.getParameter(paraName)));
+					break;
 				} else if (typeName.contains("boolean")) {
 					f.set(form, Boolean.parseBoolean(request.getParameter(paraName)));
+					break;
 				} else if (typeName.contains("byte")) {
 					f.set(form, Byte.parseByte(request.getParameter(paraName)));
+					break;
 				} else if (typeName.contains("short")) {
 					f.set(form, Short.parseShort(request.getParameter(paraName)));
+					break;
 				} else if (typeName.contains("long")) {
 					f.set(form, Long.parseLong(request.getParameter(paraName)));
+					break;
 				} else if (typeName.contains("float")) {
 					f.set(form, Float.parseFloat(request.getParameter(paraName)));
+					break;
 				} else if (typeName.contains("double")) {
 					f.set(form, Double.parseDouble(request.getParameter(paraName)));
+					break;
 				} else if (typeName.contains("java.util.Date")) {
 					SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 					java.util.Date date = sdFormat.parse(request.getParameter(paraName));
 					f.set(form, date);
+					break;
 				} else if (typeName.contains("java.sql.Date")) {
 					f.set(form, java.sql.Date.valueOf(request.getParameter(paraName)));
+					break;
 				} else if (typeName.contains("java.sql.Time")) {
 					f.set(form, java.sql.Time.valueOf(request.getParameter(paraName)));
+					break;
 				}
 
 				f.setAccessible(false);
