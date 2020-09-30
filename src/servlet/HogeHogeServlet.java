@@ -52,6 +52,8 @@ public class HogeHogeServlet extends HttpServlet {
 	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
 
 		//バインディングするBean名(Form名)を取得 formはからでもOK
 		Optional<String> formNameOpt = Optional.ofNullable(request.getParameter("formName"));
@@ -117,46 +119,12 @@ public class HogeHogeServlet extends HttpServlet {
 						String[] urlAndMethod = urlAndMethodStr.split(" : ", 0);
 
 						/*
-						//ログ発生箇所
-						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-						//処理内容
-						System.out.println("InstanceScopeを確認しています");
-
 						for(Field f : clazz.getDeclaredFields()) {
 							f.setAccessible(true);
 							Object field = f.get(actionObj);
 							f.setAccessible(false);
-
-							//Sessionの格納
-							if(field.getClass().isAnnotationPresent(SessionScoped.class)) {
-								//ログ発生箇所
-								System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-								//例外内容
-								System.out.println("Sessionにインスタンスを格納します。" + "インスタンス名：" + f.getName());
-								HttpSession session = request.getSession(true);
-								Object obj = actionObj;
-								session.setAttribute(f.getName(), obj);
-							}
-							*/
-
-							/*
-							//Cookieの格納
-							for(Field f1 : field.getClass().getDeclaredFields()) {
-								//ログ発生箇所
-								System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
-								//例外内容
-								System.out.println("Cookieにインスタンスを格納します。" + "フィールド名：" + f1.getName());
-								if(f1.isAnnotationPresent(CookieScoped.class)) {
-
-									f.setAccessible(true);
-									Object obj = f1.get(field);
-									f.setAccessible(false);
-
-									Cookie cookie = new Cookie(f1.getName(), obj.toString());
-									response.addCookie(cookie);
-								}
-							}
-							*/
+						}
+						*/
 
 						invokeMethodCheck = true;
 

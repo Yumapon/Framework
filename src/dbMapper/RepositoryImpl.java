@@ -135,6 +135,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 					if(!f.isAnnotationPresent(column.class)) {
 						continue;
 					}
+					System.out.println(f.getName());
 					f.setAccessible(true);
 					qi.getColumnValues().put(f.getName(), f.get(entity).toString());
 					f.setAccessible(false);
