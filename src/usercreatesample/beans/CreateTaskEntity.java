@@ -1,5 +1,6 @@
 package usercreatesample.beans;
 
+
 import annotation.SessionScoped;
 
 @SessionScoped

@@ -79,7 +79,6 @@
 		String taskName =  tasklist.get(i).getName();
 		String content = tasklist.get(i).getContent();
 		String client = tasklist.get(i).getClient();
-
 %>
 
         <tr>

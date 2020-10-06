@@ -1,12 +1,10 @@
 package usercreatesample.actions;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 import annotation.ActionMethod;
 import annotation.FormInjection;
 import annotation.Service;
-import dbMapper.RepositoryImpl;
 import entityCreater.entity.Task_list;
 import servlet.Model;
 import servlet.Value;
@@ -90,26 +88,6 @@ public class Action {
 		value.setObj(taskList);
 		model.getSessionObj().add(value);
 		model.setNextPage("list.jsp");
-
-		return model;
-	}
-
-	@ActionMethod("jsonTest")
-	public Model actionMethod4() {
-		System.out.println("アクションクラスのメソッドが実行されました！！！！！");
-
-		RepositoryImpl<entityCreater.entity.Test, String> repos3 = new RepositoryImpl<>();
-		Optional<entityCreater.entity.Test> entityOpt;
-		entityOpt = repos3.multiFindById("swswswwswswwsws");
-
-		Model model = new Model();
-		if (entityOpt.isPresent()) {
-			//Test一覧を取得
-			entityCreater.entity.Test test = entityOpt.get();
-			//taskListをjsonにセット(どんな型でも良い)
-			model.setJSON();
-			model.setJsonObj(test);
-		}
 
 		return model;
 	}

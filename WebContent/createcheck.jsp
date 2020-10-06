@@ -42,7 +42,7 @@
 	CreateTaskEntity task = (CreateTaskEntity)session.getAttribute("usercreatesample.beans.CreateTaskEntity");
 
 	//タスク内容を取得
-	String deadLine = task.getDeadline().toString();;
+	String deadLine = task.getDeadline().toString();
 	String taskName =  task.getTaskName();
 	String content = task.getContent();
 	String client = task.getClient();
