@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import annotation.ActionMethod;
 import annotation.RequestScoped;
 import annotation.SessionScoped;
@@ -58,7 +60,7 @@ public class HogeHogeServlet extends HttpServlet {
 		//バインディングするBean名(Form名)を取得 formはからでもOK
 		Optional<String> formNameOpt = Optional.ofNullable(request.getParameter("formName"));
 		//Actionクラス名を取得
-		String actionName= request.getParameter("actionName");
+		String actionName = request.getParameter("actionName");
 		//実行するメソッド名を取得
 		String actionMethodName = request.getParameter("actionMethodName");
 
@@ -73,7 +75,7 @@ public class HogeHogeServlet extends HttpServlet {
 		//formName.actionName.actionMethodは必要ないので削除
 		//formNameは格納されていない可能性があるので、格納されている場合のみ削除
 		int index = paraNameList.indexOf("formName");
-		if(index != (-1)) {
+		if (index != (-1)) {
 			paraNameList.remove(index);
 		}
 		paraNameList.remove(paraNameList.indexOf("actionName"));
@@ -98,15 +100,13 @@ public class HogeHogeServlet extends HttpServlet {
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//処理内容
 		System.out.println("実行するメソッドを探しています。");
-		//実行できたか確認するフラグ
-		boolean invokeMethodCheck = false;
 
-		for(Method m2 : methods) {
-			if(m2.isAnnotationPresent(ActionMethod.class)) {
+		for (Method m2 : methods) {
+			if (m2.isAnnotationPresent(ActionMethod.class)) {
 				ActionMethod aMethod = m2.getAnnotation(ActionMethod.class);
-				if(!(aMethod.value().equals(actionMethodName))) {
+				if (!(aMethod.value().equals(actionMethodName))) {
 					continue;
-				}else {
+				} else {
 					try {
 						//ログ発生箇所
 						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -117,19 +117,67 @@ public class HogeHogeServlet extends HttpServlet {
 						//遷移先URLとメソッド（forword or redirect）などを取得
 						Model model = (Model) m2.invoke(actionObj);
 
-						//WEBの場合
-						if(model.getType().equals("web")) {
-							invokeMethodCheck = true;
+						//Sessionスコープが指定されているものを格納する
+						//ログ発生箇所
+						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+						//処理内容
+						System.out.println("ModelにSessionとして格納されているものをsessionに格納します");
+						ArrayList<Value> list = model.getSessionObj();
+						int size = list.size();
+						HttpSession session = request.getSession(true);
+						Value value;
+						for (int i = 0; i < size; i++) {
+							value = list.get(i);
+							session.setAttribute(value.getName(), value.getObj());
+						}
 
-							if(model.getMethod().equals("forword")) {
+						//Requestスコープが指定されているものを格納する
+						//ログ発生箇所
+						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+						//処理内容
+						System.out.println("ModelにRequestとして格納されているものをRequestに格納します");
+						ArrayList<Value> list2 = model.getRequestObj();
+						int size2 = list2.size();
+						Value value2;
+						for (int i = 0; i < size2; i++) {
+							value2 = list2.get(i);
+							request.setAttribute(value2.getName(), value2.getObj());
+						}
+
+						//WEBの場合
+						if (model.getType().equalsIgnoreCase("WEB")) {
+
+							//遷移先・遷移方法を判断し、遷移する
+							if (model.getMethod().equals("forword")) {
 								request.getRequestDispatcher(model.getNextPage()).forward(request, response);
-							}else if(model.getMethod().equals("redirect")) {
+							} else if (model.getMethod().equals("redirect")) {
 								response.sendRedirect(model.getNextPage());
-							}else {
+							} else {
 								throw new IlligalMethodNameException();
 							}
 						}
 
+						//APIの場合
+						if (model.getType().equalsIgnoreCase("JSON")) {
+							//JSONにするデータを取得
+							Object jsonObj = model.getJsonObj();
+
+							//JavaObjectからJSONに変換
+							ObjectMapper mapper = new ObjectMapper();
+							String json = mapper.writeValueAsString(jsonObj);
+							//JSONの出力
+							response.getWriter().write(json);
+						}
+
+						//GUIの場合
+						if (model.getType().equalsIgnoreCase("GUI")) {
+
+						} else {
+							//ログ発生箇所
+							System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+							//処理内容
+							System.out.print("WEB,API,GUIのいずれかをModelクラスのTypeFieldにセットしてください");
+						}
 
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
 
@@ -143,9 +191,6 @@ public class HogeHogeServlet extends HttpServlet {
 					}
 				}
 			}
-		}
-		if(!invokeMethodCheck) {
-			System.out.println("指定されたメソッドは見つかりませんでした");
 		}
 
 	}
@@ -174,7 +219,7 @@ public class HogeHogeServlet extends HttpServlet {
 		Class<?> clazz = actionObj.getClass();
 
 		System.out.println("------ActionClassのField------");
-		for(Field f1 : clazz.getDeclaredFields()) {
+		for (Field f1 : clazz.getDeclaredFields()) {
 			System.out.println(f1.getName());
 		}
 		System.out.println("------------------------------");
@@ -199,7 +244,7 @@ public class HogeHogeServlet extends HttpServlet {
 			System.out.println("InstanceScopeを確認しています");
 
 			//Sessionへの格納
-			if(form.getClass().isAnnotationPresent(SessionScoped.class)) {
+			if (form.getClass().isAnnotationPresent(SessionScoped.class)) {
 				//ログ発生箇所
 				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 				//例外内容
@@ -212,7 +257,7 @@ public class HogeHogeServlet extends HttpServlet {
 				//すでにSessionに入っている場合
 				HttpSession session = request.getSession(true);
 				Object obj = session.getAttribute(form.getClass().getName());
-				if(obj != null) {
+				if (obj != null) {
 					//ログ発生箇所
 					System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 					//例外内容
@@ -231,7 +276,7 @@ public class HogeHogeServlet extends HttpServlet {
 			}
 
 			//Requestへの格納
-			if(form.getClass().isAnnotationPresent(RequestScoped.class)) {
+			if (form.getClass().isAnnotationPresent(RequestScoped.class)) {
 				//ログ発生箇所
 				System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 				//例外内容
@@ -268,7 +313,7 @@ public class HogeHogeServlet extends HttpServlet {
 
 		//確認用
 		System.out.println("-------FormClassのField-------");
-		for(Field f : form.getClass().getDeclaredFields()) {
+		for (Field f : form.getClass().getDeclaredFields()) {
 			System.out.println(f.getName());
 		}
 		System.out.println("------------------------------");
@@ -299,10 +344,10 @@ public class HogeHogeServlet extends HttpServlet {
 
 				if (typeName.contains("[Ljava.lang.String")) {
 					f.set(form, request.getParameterValues(paraName));
-				}else if(typeName.contains("String")) {
+				} else if (typeName.contains("String")) {
 					f.set(form, request.getParameter(paraName));
 					break;
-				}else if (typeName.contains("int")) {
+				} else if (typeName.contains("int")) {
 					f.set(form, Integer.parseInt(request.getParameter(paraName)));
 					break;
 				} else if (typeName.contains("boolean")) {
@@ -398,7 +443,6 @@ for (int i = 0; i < (paraNameList.size() - 1); i++) {
 }
 */
 
-
 //Beanのライフタイムがセッションスコープであれば、セッションに格納する
 /*
 if (iaco.getClazz().isAnnotationPresent(SessionScoped.class)) {
@@ -410,4 +454,3 @@ if (iaco.getClazz().isAnnotationPresent(SessionScoped.class)) {
 	session.setAttribute(formName, form);
 }
 */
-

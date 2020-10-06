@@ -1,20 +1,34 @@
 package usercreatesample.businessLogic;
 
-import usercreatesample.beans.TestA;
+import java.util.ArrayList;
 
-/**
- * 動作確認用クラス
- * @author okamotoyuuma
- *
- */
+import entityCreater.entity.Task_list;
+import entityCreater.entity.User_id;
+import usercreatesample.exception.falseLogionException;
+import usercreatesample.exception.notExistException;
+
 public interface BusinessLogic {
 
-	void testMethod();
+	//ログインロジック
+	void login(User_id user_id) throws falseLogionException, notExistException;
 
-	void testMethod(TestA testA);
+	//ログアウトロジック
+	//void logout();
 
-	boolean login(String pass);
+	//Task保存ロジック
+	void taskstorage(Task_list task_list);
 
-	void login(String a, String b);
+	//一覧取得ロジック
+	ArrayList<Task_list> getList();
+
+	//Task削除ロジック
+	void deleteTask(String[] taskNumList);
+
+	//Task番号採番
+	String taskNum();
+
+	//user登録ロジック
+	//void register(User_id user_id) throws DuplicationError;
 
 }
+

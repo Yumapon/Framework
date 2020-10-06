@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Model {
 
 	//Type(Web,API,Windows)
-	String type = "web";
+	String type = "WEB";
 
 	//遷移先
 	String nextPage;
@@ -14,10 +14,13 @@ public class Model {
 	String method = "forword";
 
 	//sessionに格納するオブジェクト
-	ArrayList<Object> sessionObj = new ArrayList<>();
+	ArrayList<Value> sessionObj = new ArrayList<>();
 
 	//Requestに格納するオブジェクト
-	ArrayList<Object> requestObj = new ArrayList<>();
+	ArrayList<Value> requestObj = new ArrayList<>();
+
+	//JSONで返すオブジェクト
+	Object jsonObj;
 
 	public String getType() {
 		return type;
@@ -25,6 +28,14 @@ public class Model {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public void setWeb() {
+		this.type = "WEB";
+	}
+
+	public void setJSON() {
+		this.type = "JSON";
 	}
 
 	public String getNextPage() {
@@ -43,21 +54,28 @@ public class Model {
 		this.method = method;
 	}
 
-	public ArrayList<Object> getSessionObj() {
+	public ArrayList<Value> getSessionObj() {
 		return sessionObj;
 	}
 
-	public void setSessionObj(ArrayList<Object> sessionObj) {
+	public void setSessionObj(ArrayList<Value> sessionObj) {
 		this.sessionObj = sessionObj;
 	}
 
-	public ArrayList<Object> getRequestObj() {
+	public ArrayList<Value> getRequestObj() {
 		return requestObj;
 	}
 
-	public void setRequestObj(ArrayList<Object> requestObj) {
+	public void setRequestObj(ArrayList<Value> requestObj) {
 		this.requestObj = requestObj;
 	}
 
+	public Object getJsonObj() {
+		return jsonObj;
+	}
+
+	public void setJsonObj(Object jsonObj) {
+		this.jsonObj = jsonObj;
+	}
 
 }

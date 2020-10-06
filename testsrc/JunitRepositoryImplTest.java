@@ -3,6 +3,7 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -31,6 +32,7 @@ public class JunitRepositoryImplTest {
 		repos4 = new RepositoryImpl<>();
 	}
 
+	@Ignore
 	@Test
 	public void test01() {
 		System.out.println("-------テスト結果1-------");
@@ -72,6 +74,7 @@ public class JunitRepositoryImplTest {
 	}
 
 
+	@Ignore
 	@Test
 	public void test02() {
 		System.out.println("-------テスト結果2-------");
@@ -82,6 +85,7 @@ public class JunitRepositoryImplTest {
 	}
 
 
+	@Ignore
 	@Test(expected = NoColumnValueException.class)
 	public void test03() {
 		System.out.println("-------テスト結果3-------");
@@ -112,6 +116,7 @@ public class JunitRepositoryImplTest {
 		tm.endTransaction();
 	}
 
+	@Ignore
 	@Test
 	public void test04() {
 		System.out.println("-------テスト結果4-------");
@@ -119,6 +124,7 @@ public class JunitRepositoryImplTest {
 		System.out.println(i);
 	}
 
+	@Ignore
 	@Test
 	public void test05() {
 		System.out.println("-------テスト結果5-------");
@@ -139,6 +145,7 @@ public class JunitRepositoryImplTest {
 			System.out.println("ないです。。");
 	}
 
+	@Ignore
 	@Test
 	public void test06() {
 		System.out.println("-------テスト結果6-------");
@@ -158,6 +165,7 @@ public class JunitRepositoryImplTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void test07() {
 		System.out.println("-------テスト結果7-------");
@@ -171,7 +179,7 @@ public class JunitRepositoryImplTest {
 		}
 	}
 
-
+	@Ignore
 	@Test
 	public void test08() {
 		System.out.println("-------テスト結果8-------");
@@ -195,7 +203,7 @@ public class JunitRepositoryImplTest {
 		}
 	}
 
-	//@Ignore
+	@Ignore
 	@Test
 	public void test09() {
 		System.out.println("-------テスト結果9-------");
@@ -208,6 +216,7 @@ public class JunitRepositoryImplTest {
 		tm.endTransaction();
 	}
 
+	@Ignore
 	@Test
 	public void test10() {
 		System.out.println("-------テスト結果10-------");
@@ -222,6 +231,7 @@ public class JunitRepositoryImplTest {
 		tm.endTransaction();
 	}
 
+	@Ignore
 	@Test
 	public void test11() {
 		System.out.println("-------テスト結果11-------");
@@ -252,4 +262,17 @@ public class JunitRepositoryImplTest {
 		}
 	}
 
+	@Ignore
+	@Test
+	public void test12() {
+		System.out.println("-------テスト結果12-------");
+		entityCreater.entity.Test2 entity = new entityCreater.entity.Test2();
+		entity.setNamename("powpowTest");
+		entity.setNum("swswswwswswwsws");
+		entity.setId(12345);
+
+		tm.beginTransaction();
+		repos4.save(entity);
+		tm.endTransaction();
+	}
 }

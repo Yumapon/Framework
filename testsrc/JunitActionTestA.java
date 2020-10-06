@@ -1,12 +1,5 @@
-import java.lang.reflect.Field;
-
-import org.junit.Test;
-
-import annotation.Service;
-import usercreatesample.actions.ActionTestA;
-
 public class JunitActionTestA {
-
+/*
 	ActionTestA a = new ActionTestA();
 
 	@Test
@@ -25,5 +18,6 @@ public class JunitActionTestA {
 			}
 		}
 	}
+	*/
 
 }
