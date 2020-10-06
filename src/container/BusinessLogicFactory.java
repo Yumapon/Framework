@@ -24,7 +24,7 @@ public class BusinessLogicFactory{
     	this.businessLogicDefinitios = businessLogicDefinitios;
     }
 
-	Object getBusinessLogic(String businessLogicName) {
+	public Object getBusinessLogic(String businessLogicName) {
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//処理内容
