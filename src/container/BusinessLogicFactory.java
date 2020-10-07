@@ -20,6 +20,13 @@ public class BusinessLogicFactory{
 	/*
 	 * コンストラクタ
 	 */
+    public BusinessLogicFactory() {
+    	//BusinessLogic定義取得ファイル
+    	BusinessLogicConfigReader blcr ;
+    	blcr = new BusinessLogicConfigReader();
+		businessLogicDefinitios = blcr.read();
+    }
+
     public BusinessLogicFactory(HashMap<String, BusinessLogicDefinition> businessLogicDefinitios) {
     	this.businessLogicDefinitios = businessLogicDefinitios;
     }
