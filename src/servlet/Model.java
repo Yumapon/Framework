@@ -22,6 +22,9 @@ public class Model {
 	//JSONで返すオブジェクト
 	Object jsonObj;
 
+	//LoginChecker
+	private boolean LoginCheckerFlag;
+
 	public String getType() {
 		return type;
 	}
@@ -76,6 +79,14 @@ public class Model {
 
 	public void setJsonObj(Object jsonObj) {
 		this.jsonObj = jsonObj;
+	}
+
+	public boolean isLoginCheckerFlag() {
+		return LoginCheckerFlag;
+	}
+
+	public void setLoginCheckerFlag(boolean loginCheckerFlag) {
+		LoginCheckerFlag = loginCheckerFlag;
 	}
 
 }

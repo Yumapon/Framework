@@ -2,29 +2,44 @@ package usercreatesample.businessLogic;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Optional;
 
 import annotation.Transactional;
 import dbMapper.Repository;
 import dbMapper.RepositoryImpl;
 import entityCreater.entity.Task_list;
 import entityCreater.entity.User_id;
-import usercreatesample.exception.falseLogionException;
-import usercreatesample.exception.notExistException;
 
 public class DefaultBusinessLogic implements BusinessLogic {
 
 	Repository<Task_list, String> Task_listRepos = new RepositoryImpl<>();
+	Repository<User_id, Integer> User_idRepos = new RepositoryImpl<>();
 
 	@Override
 	//ログイン処理の実装(ログイン失敗、該当のユーザIDが存在しない場合は例外処理発生)
-	public void login(User_id user_id) throws falseLogionException, notExistException {
+	public boolean login(User_id user_id) {
 
 		//確認用
 		System.out.println("ログイン機能スタート");
 
-		//空実装
-
-		System.out.println("ログインに成功しました。");
+		//ログイン処理
+		Optional<User_id> uiOpt = User_idRepos.findById(user_id.getId());
+		if(uiOpt.isPresent()) {
+			User_id ui = uiOpt.get();
+			if(user_id.getPassword().equals(ui.getPassword())) {
+				//ログイン成功
+				System.out.println("ログインに成功しました。");
+				return true;
+			}else {
+				//ログイン失敗
+				System.out.println("ログインに失敗しました。");
+				return false;
+			}
+		}else {
+			//ログイン失敗
+			System.out.println("ログインに失敗しました。");
+			return false;
+		}
 	}
 
 

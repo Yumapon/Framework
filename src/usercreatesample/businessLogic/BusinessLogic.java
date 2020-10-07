@@ -4,13 +4,11 @@ import java.util.ArrayList;
 
 import entityCreater.entity.Task_list;
 import entityCreater.entity.User_id;
-import usercreatesample.exception.falseLogionException;
-import usercreatesample.exception.notExistException;
 
 public interface BusinessLogic {
 
 	//ログインロジック
-	void login(User_id user_id) throws falseLogionException, notExistException;
+	boolean login(User_id user_id);
 
 	//ログアウトロジック
 	//void logout();

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import annotation.ActionMethod;
 import annotation.FormInjection;
+import annotation.LoginCheck;
 import annotation.Service;
 import entityCreater.entity.Task_list;
 import servlet.Model;
@@ -17,6 +18,7 @@ import usercreatesample.businessLogic.BusinessLogic;
  * @author okamotoyuuma
  *
  */
+@LoginCheck
 public class Action {
 
 	@Service
@@ -90,6 +92,20 @@ public class Action {
 		model.setNextPage("list.jsp");
 
 		return model;
+	}
+
+	@ActionMethod("jsonTest")
+	public Model actionMethod4() {
+		//task一覧を取得
+		ArrayList<Task_list> taskList = bl1.getList();
+
+		//taskListをJSONセット
+		Model model = new Model();
+		model.setJSON();
+		model.setJsonObj(taskList);
+
+		return model;
+
 	}
 
 }

@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +21,8 @@ import javax.servlet.http.HttpSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import annotation.ActionMethod;
+import annotation.Login;
+import annotation.LoginCheck;
 import annotation.RequestScoped;
 import annotation.SessionScoped;
 import container.ApplicationContainer;
@@ -111,11 +114,88 @@ public class HogeHogeServlet extends HttpServlet {
 						//ログ発生箇所
 						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 						//処理内容
-						System.out.print("実行するメソッドが見つかりました。実行します 実行するメソッド：");
+						System.out.print("実行するメソッドが見つかりました。メソッド名：");
 						System.out.println(m2.getName());
+
+						if (m2.isAnnotationPresent(LoginCheck.class) || clazz.isAnnotationPresent(LoginCheck.class)) {
+							//ログイン確認
+							//ログ発生箇所
+							System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+							//処理内容
+							System.out.println("ログインチェックを行います");
+							//session,Cookieを取得、新規作成は行わない
+							HttpSession session = request.getSession(false);
+							Cookie[] cookies = request.getCookies();
+							Cookie sessionIdCookie = null;
+							String sessionId = null;
+							for (int i = 0; i < cookies.length; i++) {
+								if (cookies[i].getName().equals("sessionId")) {
+									sessionIdCookie = cookies[i];
+									sessionId = sessionIdCookie.getValue();
+
+									//確認用
+									//ログ発生箇所
+									System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+									//処理内容
+									System.out.println("Cookieに格納されているのは" + sessionId);
+									//ログ発生箇所
+									System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+									//処理内容
+									System.out.println("Sessionに格納されているのは" + session.getId());
+									if (sessionId != session.getId()) {
+										//ログ発生箇所
+										System.out
+												.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+										//処理内容
+										System.out.println("セッションIDが一致しました。同一クライアントからのリクエストです。");
+									}
+								}
+							}
+							//ログインされていない場合
+							if (session == null || sessionIdCookie == null || !(sessionId.equals(session.getId()))) {
+								//エラーメッセージを返却
+								ObjectMapper mapper = new ObjectMapper();
+								String json = mapper.writeValueAsString(new ErrorObj());
+
+								//JSONの出力
+								response.getWriter().write(json);
+								return;
+							}
+							/*
+							 * ログインチェックができたら、先へ進む
+							 */
+						}
 
 						//遷移先URLとメソッド（forword or redirect）などを取得
 						Model model = (Model) m2.invoke(actionObj);
+
+						//ログ発生箇所
+						System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+						//処理内容
+						System.out.print("LoginMethodかどうか確認");
+						if (m2.isAnnotationPresent(Login.class)) {
+							if (model.isLoginCheckerFlag()) {
+								//ログ発生箇所
+								System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+								//処理内容
+								System.out.println("ログイン初期処理を開始します。");
+								InitProcess(request);
+
+								//cookie作成して、セッションIDを格納し、リクエストにクッキーを格納
+								String sessionId = request.getSession().getId();
+								Cookie sessionIdCookie = new Cookie("sessionId", sessionId);
+								response.addCookie(sessionIdCookie);
+
+								//ログ発生箇所
+								System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+								//処理内容
+								System.out.println("ログイン処理が完了しました。");
+							}
+							//ログ発生箇所
+							System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
+							//処理内容
+							System.out.println("ログイン処理は実行されませんでした");
+						}
 
 						//Sessionスコープが指定されているものを格納する
 						//ログ発生箇所
@@ -176,7 +256,7 @@ public class HogeHogeServlet extends HttpServlet {
 							//ログ発生箇所
 							System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 							//処理内容
-							System.out.print("WEB,API,GUIのいずれかをModelクラスのTypeFieldにセットしてください");
+							System.out.print("WEB,JSON,GUIのいずれかをModelクラスのTypeFieldにセットしてください");
 						}
 
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
@@ -388,6 +468,26 @@ public class HogeHogeServlet extends HttpServlet {
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
 		//処理内容
 		System.out.println(formName + "への値のセットが完了しました。");
+	}
+
+	//ログイン成功時初期処理
+	private void InitProcess(final HttpServletRequest request) {
+
+		//sessionの再発行
+		//request.getSession(true).invalidate();
+		//確認用
+		HttpSession session = request.getSession();
+		String beforeSessionId = session.getId();
+		session.invalidate();
+
+		session = request.getSession(true);
+		String afterSessionId = session.getId();
+
+		//確認用
+		if (beforeSessionId != afterSessionId) {
+			System.out.println("session再発行の完了");
+		}
+
 	}
 
 }
