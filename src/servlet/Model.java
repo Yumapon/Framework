@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Model {
 
-	//Type(Web,API,Windows)
+	//Type(Web,API)
 	String type = "WEB";
 
 	//遷移先
