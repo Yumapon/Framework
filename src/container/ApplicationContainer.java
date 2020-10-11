@@ -8,8 +8,6 @@ public interface ApplicationContainer {
 
 	Object generator();
 
-	//InstanceAndClassObjectforServlet getCAMS(String instanceName);
-
 	Object getAction(String actionName);
 
 }

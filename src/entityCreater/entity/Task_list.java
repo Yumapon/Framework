@@ -1,9 +1,6 @@
 package entityCreater.entity;
 
-import java.util.List;
-
 import annotation.Entity;
-import annotation.OneToMany;
 import annotation.OneToOne;
 import annotation.Table;
 import annotation.column;
@@ -31,17 +28,6 @@ public class Task_list {
 
 	@OneToOne
 	private entityCreater.entity.Test test;
-
-	@OneToMany(mappingBy = {"num"})
-	private List<Test2> test2;
-
-	public List<Test2> getTest2() {
-		return test2;
-	}
-
-	public void setTest2(List<Test2> test2) {
-		this.test2 = test2;
-	}
 
 	public entityCreater.entity.Test getTest() {
 		return test;

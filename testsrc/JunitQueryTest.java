@@ -9,14 +9,14 @@ import org.junit.Test;
 
 import entityCreater.entity.Task_list;
 import entityCreater.entity.User_id;
-import query.Query;
+import query.MysqlQuery;
 import query.QueryInfo;
 
 public class JunitQueryTest {
 
 	//User_id entity = new User_id();
-	Query q;
-	Query q2;//Task_list用
+	MysqlQuery q;
+	MysqlQuery q2;//Task_list用
 
 	String sql;
 
@@ -30,7 +30,7 @@ public class JunitQueryTest {
 	public void setUp() {
 		System.out.println("-------テスト結果-------");
 		//クエリクラスの生成
-		q = new Query();
+		q = new MysqlQuery();
 		entity = new User_id();
 		entity.setId(121212);
 		entity.setPassword("asasasasas");
@@ -50,7 +50,7 @@ public class JunitQueryTest {
 		qi.setColumnValues(value);
 
 		//クエリクラスの生成
-		q2 = new Query();
+		q2 = new MysqlQuery();
 		entity2 = new Task_list();
 		entity2.setNum("hogehoge");
 		entity2.setClient("poyopoyo");

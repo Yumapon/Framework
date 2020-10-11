@@ -19,13 +19,22 @@ import annotation.OneToOne;
 import annotation.Table;
 import annotation.column;
 import annotation.id;
+import container.DBConfig;
+import container.EnvironmentConfigReader;
 import query.Query;
+import query.QueryFactory;
 import query.QueryInfo;
 
 public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 
+	//設定ファイルからDBTypeを取得
+	//DB設定の取得
+	EnvironmentConfigReader ecr = new EnvironmentConfigReader();
+	DBConfig dbc = ecr.read();
+	String dbType = dbc.getDbType();
+
 	//Queryクラス
-	Query query = new Query();
+	Query query = new QueryFactory().getQueryClass(dbType);
 	//Query用オブジェクト
 	QueryInfo qi = new QueryInfo();
 
@@ -132,7 +141,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 			//entityのカラム値を取得
 			for (Field f : entity.getClass().getDeclaredFields()) {
 				try {
-					if(!f.isAnnotationPresent(column.class)) {
+					if (!f.isAnnotationPresent(column.class)) {
 						continue;
 					}
 					System.out.println(f.getName());
@@ -509,7 +518,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 	}
 
 	@Override
-	public Optional<T> multiFindById(ID primaryKey){
+	public Optional<T> multiFindById(ID primaryKey) {
 		//まずは@columnに値をセットする
 		//ログ発生箇所
 		System.out.print(Thread.currentThread().getStackTrace()[1].getClassName() + ":");
@@ -713,7 +722,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 					Object childEntity = null;
 					Type superType = f.getGenericType();
 					System.out.println(superType.getTypeName());
-					Type[] types = ((ParameterizedType)superType).getActualTypeArguments();
+					Type[] types = ((ParameterizedType) superType).getActualTypeArguments();
 					try {
 						Class<?> clazz = Class.forName(types[0].getTypeName());
 						childEntity = clazz.getDeclaredConstructor().newInstance();
@@ -747,7 +756,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 					Map<String, String> columnValues = new HashMap<>();
 					Field f2 = null;
 					String columnValue = null;
-					for(String columnName : mapping) {
+					for (String columnName : mapping) {
 						try {
 							f2 = entity.getClass().getDeclaredField(columnName);
 							f2.setAccessible(true);
@@ -755,7 +764,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 							f2.setAccessible(false);
 						} catch (NoSuchFieldException | SecurityException e) {
 							e.printStackTrace();
-						}catch (IllegalArgumentException | IllegalAccessException e) {
+						} catch (IllegalArgumentException | IllegalAccessException e) {
 							e.printStackTrace();
 						}
 						columnValues.put(columnName, columnValue);
@@ -767,7 +776,7 @@ public class RepositoryImpl<T, ID> implements Repository<T, ID> {
 
 					//主キー検索でないので、カラム名情報を取得する
 					ArrayList<String> columnNames = new ArrayList<>();
-					for(String columnName : mapping) {
+					for (String columnName : mapping) {
 						columnNames.add(columnName);
 					}
 

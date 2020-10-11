@@ -21,9 +21,6 @@ public class Test2 {
 	private String namename;
 
 	@ManyToOne
-	private Task_list task_list;
-
-	@ManyToOne
 	private entityCreater.entity.Test test;
 
 	public entityCreater.entity.Test getTest() {
@@ -32,14 +29,6 @@ public class Test2 {
 
 	public void setTest(entityCreater.entity.Test test) {
 		this.test = test;
-	}
-
-	public Task_list getTask_list() {
-		return task_list;
-	}
-
-	public void setTask_list(Task_list task_list) {
-		this.task_list = task_list;
 	}
 
 	public void setId(Integer id) {

@@ -15,11 +15,17 @@ public class DBConfig {
 	//パスワード
 	String password;
 
+	//スキーマ名
+	String schema;
+
 	//コネクションの確立数
 	int numberOfAccess;
 
 	//DBName
 	String dbName;
+
+	//DBType
+	String dbType;
 
 	public String getDriver() {
 		return driver;
@@ -53,6 +59,14 @@ public class DBConfig {
 		this.password = password;
 	}
 
+	public String getSchema() {
+		return schema;
+	}
+
+	public void setSchema(String schema) {
+		this.schema = schema;
+	}
+
 	public int getNumberOfAccess() {
 		return numberOfAccess;
 	}
@@ -67,6 +81,14 @@ public class DBConfig {
 
 	public void setDbName(String dbName) {
 		this.dbName = dbName;
+	}
+
+	public String getDbType() {
+		return dbType;
+	}
+
+	public void setDbType(String dbType) {
+		this.dbType = dbType;
 	}
 
 }
